@@ -121,9 +121,7 @@ client.on("messageCreate", async (message) => {
 // CHECK BIRTHDAY
 async function checkBirthday() {
   var date = new Date()
-  console.log(date.getHours() + " " + date.getMinutes())
-  if(date.getHours() === 7 && date.getMinutes() === 56){
-    console.log("2")
+  if(date.getHours() === 8 && date.getMinutes() === 14){
     const channel = await client.channels.fetch('298160067088220170')
     var user = await birthday.checkBirthday()
     
