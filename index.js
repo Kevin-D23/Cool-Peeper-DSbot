@@ -29,7 +29,8 @@ client.on("messageCreate", (message) => {
 // ELLO
 client.on("messageCreate", (message) => {
   if(message.content.toLowerCase().includes("ello")) {
-    message.channel.send("ELLO")
+    if(message.author.id != client.user.id)
+      message.channel.send("ELLO")
   }
 })
 
