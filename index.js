@@ -26,6 +26,13 @@ client.on("messageCreate", (message) => {
   }
 })
 
+// ELLO
+client.on("messageCreate", (message) => {
+  if(message.content.toLowerCase().includes("ello")) {
+    message.channel.send("ELLO")
+  }
+})
+
 // ADD BIRTHDAY
 client.on("messageCreate", async (message) => {
   if(message.content.toLowerCase() === "!addbirthday"){
@@ -150,12 +157,6 @@ client.on("messageCreate", (message) => {
     message.reply(gameSelect.pickGame(games))
     }
   })
-
-
-
-
-
-  
 
 
 client.login(process.env.TOKEN)
