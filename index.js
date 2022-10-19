@@ -16,7 +16,7 @@ const client = new Client({
 client.on('ready', () => {
   console.log(`Logg in as ${client.user.tag}!`);
 
-  setInterval(()=>console.log("test"), 10000);
+  setInterval(checkBirthday(), 10000);
 });
 
 // PING PONG
@@ -121,7 +121,9 @@ client.on("messageCreate", async (message) => {
 // CHECK BIRTHDAY
 async function checkBirthday() {
   var date = new Date()
+  console.log("1")
   if(date.getHours() === 7 && date.getMinutes() === 46){
+    console.log("2")
     const channel = await client.channels.fetch('298160067088220170')
     var user = await birthday.checkBirthday()
     
