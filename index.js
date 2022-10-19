@@ -16,7 +16,7 @@ const client = new Client({
 client.on('ready', () => {
   console.log(`Logg in as ${client.user.tag}!`);
 
-  setInterval(checkBirthday, 10000);
+  setInterval(console.log("test"), 10000);
 });
 
 // PING PONG
