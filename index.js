@@ -14,7 +14,7 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+  console.log(`Logg in as ${client.user.tag}!`);
 
   setInterval(checkBirthday, 10000);
 });
@@ -121,7 +121,7 @@ client.on("messageCreate", async (message) => {
 // CHECK BIRTHDAY
 async function checkBirthday() {
   var date = new Date()
-  if(date.getHours() === 7 && date.getMinutes() === 41){
+  if(date.getHours() === 7 && date.getMinutes() === 44){
     const channel = await client.channels.fetch('298160067088220170')
     var user = await birthday.checkBirthday()
     
