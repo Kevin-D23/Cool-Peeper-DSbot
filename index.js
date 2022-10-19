@@ -92,7 +92,14 @@ client.on("messageCreate", async (message) => {
           console.log(err)
           message.channel.send("Error: Timed out")
         })
-      }
+        const channel = await client.channels.fetch('298160067088220170')
+        var user = await birthday.checkBirthday()
+    
+        if(user != null){
+          channel.send({content: `Happy Birthday, <@${user}>!`})
+        }
+
+    }
   }
 })
 
