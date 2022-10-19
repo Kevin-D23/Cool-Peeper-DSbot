@@ -58,7 +58,7 @@ client.on("messageCreate", async (message) => {
 
             // Check if birth day is valid with corresponding month
             message.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
-              .then((collected) => {
+              .then(async (collected) => {
                 day = Math.floor(collected.first().content)
                 if(day > 0 && day <= 31){
                   if(month === 2){
@@ -92,12 +92,15 @@ client.on("messageCreate", async (message) => {
           console.log(err)
           message.channel.send("Error: Timed out")
         })
-        const channel = await client.channels.fetch('298160067088220170')
-        var user = await birthday.checkBirthday()
-    
-        if(user != null){
-          channel.send({content: `Happy Birthday, <@${user}>!`})
-        }
+        setTimeout(async () => {
+          const channel = await client.channels.fetch('298160067088220170')
+          var user = await birthday.checkBirthday()
+
+          if(user != null){
+            channel.send({content: `Happy Birthday, <@${user}>!`})
+          }
+        },7000)
+      
 
     }
   }
