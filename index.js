@@ -15,6 +15,8 @@ const client = new Client({
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+
+  setInterval(checkBirthday, 60000);
 });
 
 // PING PONG
@@ -116,6 +118,18 @@ client.on("messageCreate", async (message) => {
   }
 })
 
+// CHECK BIRTHDAY
+async function checkBirthday() {
+  var date = new Date()
+  if(date.getHours() === 7 && date.getMinutes() === 0){
+    const channel = await client.channels.fetch('298160067088220170')
+    var user = await birthday.checkBirthday()
+    if(user != null){
+      channel.send({content: `Happy Birthday, <@${user}>!`})
+    }
+  }
+}
+
 
 // PICK GAME 
 client.on("messageCreate", (message) => {
@@ -125,6 +139,12 @@ client.on("messageCreate", (message) => {
     message.reply(gameSelect.pickGame(games))
     }
   })
+
+
+
+
+
+  
 
 
 client.login(process.env.TOKEN)

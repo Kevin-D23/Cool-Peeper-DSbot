@@ -53,7 +53,21 @@ async function findBirthday(Username) {
   }
 }
 
+async function checkBirthday() {
+  var date = new Date();
+  var today = [date.getMonth() + 1, date.getDate()]
+  const birthday = await Birthday.findOne({month: today[0], day: today[1]})
+  if(birthday != null)
+  {
+    return birthday.username
+  }
+
+  else 
+    return null
+}
+
 module.exports.addBirthday = addBirthday;
 module.exports.doesExist = doesExist;
 module.exports.removeBirthday = removeBirthday
 module.exports.findBirthday = findBirthday
+module.exports.checkBirthday = checkBirthday
