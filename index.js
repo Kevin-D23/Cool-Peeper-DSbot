@@ -14,7 +14,8 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-  console.log(`Logg in as ${client.user.tag}!`);
+  console.log(`Logged in as ${client.user.tag}!`);
+  client.user?.setPresence({status: 'dnd', activities: [{name:  "with myself"}]})
 
   setInterval(checkBirthday, 60000);
 });
