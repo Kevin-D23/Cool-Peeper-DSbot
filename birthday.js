@@ -41,7 +41,7 @@ async function removeBirthday (Username) {
 async function findBirthday(Username) {
   if(await doesExist(Username) === null){
     console.log(Username)
-    return "Birthday is not in databse"
+    return "Birthday is not in database"
   }
   else {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
