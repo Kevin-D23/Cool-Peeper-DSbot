@@ -1,7 +1,7 @@
 require('dotenv/config')
 const { Client, GatewayIntentBits} = require('discord.js');
-const birthday = require('./birthday.js')
-const gameSelect = require('./pickGame.js')
+const birthday = require('./commands/birthday.js')
+const gameSelect = require('./commands/pickGame.js')
 const BirthdayObj = require('./models/birthdayModel')
 const mongoose = require('mongoose')
 
