@@ -1,5 +1,5 @@
 require('dotenv/config')
-const Birthday = require('./models/birthdayModel')
+const Birthday = require('../models/birthdayModel')
 const mongoose = require('mongoose')
 
 mongoose.connect(process.env.dbURI, {useNewUrlParser: true, useUnifiedTopology: true})
