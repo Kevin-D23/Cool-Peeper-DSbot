@@ -1,5 +1,5 @@
 require('dotenv/config')
-const { Client, GatewayIntentBits} = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events} = require('discord.js');
 const birthday = require('./commands/birthday.js')
 const gameSelect = require('./commands/pickGame.js')
 const BirthdayObj = require('./models/birthdayModel')
@@ -9,7 +9,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers
   ] 
 });
 
@@ -161,4 +162,89 @@ client.on("messageCreate", (message) => {
   })
 
 
+  // role selector
+  client.on("guildMemberAdd", (member) => {
+   var channelID = "689184769677983774"
+   var channel = member.guild.channels.cache.get(channelID);
+
+    const roleSelector = new SelectMenuBuilder()
+        .setCustomId("roles")
+        .setPlaceholder("Please select your roles")
+        .setMinValues(0)
+        .setMaxValues(4)
+        .setOptions([
+          { label: `Angie's Peeps`, value: 'angela'},
+          { label: `Kevin's Peeps`, value: 'kevin'},
+          { label: `Brian's Peeps`, value: 'brian'},
+          { label: `Alex's Peeps` , value: 'alex'}
+        ]);
+
+    channel.send(({content: `Welcome to the server <@${member.id}>\n`, components: [new ActionRowBuilder().setComponents(roleSelector)]}));
+
+});
+
+
+// role selector when clicked
+client.on(Events.InteractionCreate, (interaction) => {
+  if(interaction.isSelectMenu())
+  {
+    if(interaction.customId === 'roles')
+      for(let i = 0; i < interaction.values.length;i++){
+        if(interaction.values[i] === 'angela'){
+          let hasRole = false;
+          for(let i = 0; i < interaction.member._roles.length; i++)
+          {
+            if(interaction.member._roles[i] === '733893079786061826'){
+              hasRole = true;
+              break;
+            }
+          }
+          if(hasRole === false){
+            interaction.member.roles.add('733893079786061826')
+          }
+        }
+        else if(interaction.values[i] === 'kevin'){
+          let hasRole = false;
+          for(let i = 0; i < interaction.member._roles.length; i++)
+          {
+            if(interaction.member._roles[i] === '806625249009336391'){
+              hasRole = true;
+              break;
+            }
+          }
+          if(hasRole === false){
+            interaction.member.roles.add('806625249009336391')
+          }
+        }
+        else if(interaction.values[i] === 'brian'){
+          let hasRole = false;
+          for(let i = 0; i < interaction.member._roles.length; i++)
+          {
+            if(interaction.member._roles[i] === '760685888665026563'){
+              hasRole = true;
+              break;
+            }
+          }
+          if(hasRole === false){
+            interaction.member.roles.add('760685888665026563')
+          }
+        }
+        else if(interaction.values[i] === 'alex'){
+          let hasRole = false;
+          for(let i = 0; i < interaction.member._roles.length; i++)
+          {
+            if(interaction.member._roles[i] === '737099202282258544'){
+              hasRole = true;
+              break;
+            }
+          }
+          if(hasRole === false){
+            interaction.member.roles.add('737099202282258544')
+          }
+        }
+      }
+  }
+})
+
 client.login(process.env.TOKEN)
+
