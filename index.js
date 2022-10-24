@@ -243,6 +243,7 @@ client.on(Events.InteractionCreate, (interaction) => {
           }
         }
       }
+      interaction.reply('Role(s) selected')
   }
 })
 
