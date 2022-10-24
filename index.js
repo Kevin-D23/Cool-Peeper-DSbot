@@ -247,7 +247,7 @@ client.on(Events.InteractionCreate, (interaction) => {
           }
         }
       }
-      interaction.editReply('Role(s) selected')
+      interaction.reply('Role(s) selected')
   }
 })
 
