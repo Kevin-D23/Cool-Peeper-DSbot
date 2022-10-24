@@ -188,62 +188,66 @@ client.on("messageCreate", (message) => {
 client.on(Events.InteractionCreate, (interaction) => {
   if(interaction.isSelectMenu())
   {
+    const angeliaID = '733893079786061826'
+    const kevinID = '806625249009336391'
+    const brianID = '760685888665026563'
+    const alexId = '737099202282258544'
     if(interaction.customId === 'roles')
       for(let i = 0; i < interaction.values.length;i++){
         if(interaction.values[i] === 'angela'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === '733893079786061826'){
+            if(interaction.member._roles[i] === angeliaID){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add('733893079786061826')
+            interaction.member.roles.add(angeliaID)
           }
         }
         else if(interaction.values[i] === 'kevin'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === '806625249009336391'){
+            if(interaction.member._roles[i] === kevinID){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add('806625249009336391')
+            interaction.member.roles.add(kevinID)
           }
         }
         else if(interaction.values[i] === 'brian'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === '760685888665026563'){
+            if(interaction.member._roles[i] === brianID){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add('760685888665026563')
+            interaction.member.roles.add(brianID)
           }
         }
         else if(interaction.values[i] === 'alex'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === '737099202282258544'){
+            if(interaction.member._roles[i] === alexId){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add('737099202282258544')
+            interaction.member.roles.add(alexId)
           }
         }
       }
-      interaction.reply('Role(s) selected')
+      interaction.editReply('Role(s) selected')
   }
 })
 
