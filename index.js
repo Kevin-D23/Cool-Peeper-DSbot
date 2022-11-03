@@ -21,6 +21,7 @@ client.on('ready', () => {
   setInterval(checkBirthday, 60000);
 });
 
+
 // PING PONG
 client.on("messageCreate", (message) => {
   if(message.content.toLowerCase() === "ping"){
@@ -164,7 +165,7 @@ client.on("messageCreate", (message) => {
 
   // role selector
   client.on("guildMemberAdd", (member) => {
-   var channelID = "689184769677983774"
+   var channelID = "1037799265726115841"
    var channel = member.guild.channels.cache.get(channelID);
 
     const roleSelector = new SelectMenuBuilder()
@@ -178,14 +179,12 @@ client.on("messageCreate", (message) => {
           { label: `Brian's Peeps`, value: 'brian'},
           { label: `Alex's Peeps` , value: 'alex'}
         ]);
-
     channel.send(({content: `Welcome to the server <@${member.id}>\n`, components: [new ActionRowBuilder().setComponents(roleSelector)]}));
 
 });
 
-
-// role selector when clicked
-client.on(Events.InteractionCreate, (interaction) => {
+ // role selector when clicked
+ client.on(Events.InteractionCreate, async (interaction) => {
   if(interaction.isSelectMenu())
   {
     const angeliaID = '733893079786061826'
@@ -247,9 +246,10 @@ client.on(Events.InteractionCreate, (interaction) => {
           }
         }
       }
-      interaction.reply('Role(s) selected')
+      await interaction.update({content: 'Role(s) Selected', components: [] })
   }
 })
+
 
 client.login(process.env.TOKEN)
 
