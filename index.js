@@ -165,23 +165,33 @@ client.on("messageCreate", (message) => {
 
   // role selector
   client.on("guildMemberAdd", (member) => {
-   var channelID = "1037799265726115841"
-   var channel = member.guild.channels.cache.get(channelID);
-
-    const roleSelector = new SelectMenuBuilder()
-        .setCustomId("roles")
-        .setPlaceholder("Please select your roles")
-        .setMinValues(0)
-        .setMaxValues(4)
-        .setOptions([
-          { label: `Angie's Peeps`, value: 'angela'},
-          { label: `Kevin's Peeps`, value: 'kevin'},
-          { label: `Brian's Peeps`, value: 'brian'},
-          { label: `Alex's Peeps` , value: 'alex'}
-        ]);
-    channel.send(({content: `Welcome to the server <@${member.id}>\n`, components: [new ActionRowBuilder().setComponents(roleSelector)]}));
-
+    selectRole(member);
 });
+
+// add role
+client.on('messageCreate', (message) => {
+  if(message.content.toLowerCase() === "!addrole") {
+    selectRole(message.member)
+  }
+})
+
+function selectRole(member){
+  var channelID = "1037799265726115841"
+  var channel = member.guild.channels.cache.get(channelID);
+
+   const roleSelector = new SelectMenuBuilder()
+       .setCustomId("roles")
+       .setPlaceholder("Please select your roles")
+       .setMinValues(0)
+       .setMaxValues(4)
+       .setOptions([
+         { label: `Angie's Peeps`, value: 'angela'},
+         { label: `Kevin's Peeps`, value: 'kevin'},
+         { label: `Brian's Peeps`, value: 'brian'},
+         { label: `Alex's Peeps` , value: 'alex'}
+       ]);
+   channel.send(({content: `Hello, <@${member.id}>\n`, components: [new ActionRowBuilder().setComponents(roleSelector)]}));
+}
 
  // role selector when clicked
  client.on(Events.InteractionCreate, async (interaction) => {
@@ -250,6 +260,18 @@ client.on("messageCreate", (message) => {
   }
 })
 
+
+// show available bot commands
+client.on("messageCreate", (message) => {
+  if(message.content.toLowerCase() === '!commands') {
+    let commands = ['Commands:', '!addbirthday', '!removebirthday', '!findbirthday', '!pickgame', '!addrole']
+    let msg = ""
+    for(let i = 0; i < commands.length; i++){
+      msg += commands[i] + "\n"
+    }
+    message.reply(msg)
+  }
+})
 
 client.login(process.env.TOKEN)
 
