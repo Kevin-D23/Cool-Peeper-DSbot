@@ -1,5 +1,5 @@
 function pickGame(games){
-    const rndInt = Math.floor(Math.random() * 5)
+    const rndInt = Math.floor(Math.random() * games.length)
 
     return "Play " + games[rndInt]
 }
