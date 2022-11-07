@@ -156,7 +156,7 @@ async function checkBirthday() {
 // PICK GAME 
 client.on("messageCreate", (message) => {
   if(message.content.toLowerCase() === '!pickgame'){
-    let games = ['Apex', 'Valorant', 'Overwatch', 'Plateup', 'Devour']
+    let games = ['Apex', 'Valorant', 'Overwatch', 'Plateup', 'Devour', 'Roblox']
 
     message.reply(gameSelect.pickGame(games))
     }
