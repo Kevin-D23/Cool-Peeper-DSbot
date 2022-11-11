@@ -1,5 +1,6 @@
 require('dotenv/config')
-const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events} = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes} = require('discord.js');
+const {REST} = require('@discordjs/rest')
 const birthday = require('./commands/birthday.js')
 const gameSelect = require('./commands/pickGame.js')
 const BirthdayObj = require('./models/birthdayModel')
@@ -17,15 +18,56 @@ const client = new Client({
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   client.user.setPresence({status: 'dnd', activities: [{name:  "with myself"}]})
-
+  main();
   setInterval(checkBirthday, 60000);
 });
 
+const commands = [
+    {
+      name: 'ping',
+      description: 'Replies with pong'
+    },
+    {
+      name: 'pickgame',
+      description: 'Pick random game to play',
+    },
+    {
+      name: 'addbirthday',
+      description: 'Add your birthday to the database',
+    },
+    {
+      name: 'removebirthday', 
+      description: 'Remove your birthday from the database'
+    },
+    {
+      name: 'findbirthday',
+      description: 'Find the date of someones birthday'
+    },
+    {
+      name: 'commands',
+      description: 'Display list of commands'
+    }
+  ]
+
+const rest = new REST({version: '10'}).setToken(process.env.TOKEN)
+
+
+async function main() {
+  try {
+    await rest.put(Routes.applicationGuildCommands(process.env.clientID, process.env.testServerID), {
+      body: commands,
+    }) 
+  } catch(err) {
+    console.log(err)
+  }
+}
+
 
 // PING PONG
-client.on("messageCreate", (message) => {
-  if(message.content.toLowerCase() === "ping"){
-    message.channel.send('pong')
+client.on("interactionCreate", (interaction) => {
+  if(interaction.isChatInputCommand()){
+    if(interaction.commandName === 'ping')
+       interaction.reply('pong')
   }
 })
 
@@ -38,104 +80,121 @@ client.on("messageCreate", (message) => {
 })
 
 // ADD BIRTHDAY
-client.on("messageCreate", async (message) => {
-  if(message.content.toLowerCase() === "!addbirthday"){
-    const result = await birthday.doesExist(message.author.id)
-    if(result != null){
-      message.channel.send("Birthday is already in databse")
-    }
-    else {
-      const filter = (m) => message.author.id === m.author.id;
-      month = Number;
-      day = Number;
-      userId = message.author.id
+client.on("interactionCreate", async (interaction) => {
+  if(interaction.isChatInputCommand()){
+    if(interaction.commandName === 'addbirthday'){
+      const result = await birthday.doesExist(interaction.user.id)
+      if(result != null){
+        interaction.reply("Birthday is already in database")
+      }
+      else {
+        month = Number;
+        day = Number;
+        userId = interaction.user.id
 
-      // Get players birth month
-      message.reply("What month is your birthday (1-12)?")
-      message.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
-        .then((collected) => {
-          month = Math.floor(collected.first().content)
+        const filter = (m) => interaction.user.id === m.author.id;
 
-          // Get players birth day depending on month
-          if(month > 0  && month <= 12){
-            if(month === 2){
-              collected.first().reply("What day were you born on (1-28)")
-            }
-            else if (month === 4 || month === 6 || month === 9 || month === 11){
-              collected.first().reply("What day were you born on (1-30)")
-            }
-            else 
-            collected.first().reply("What day were you born on (1-31)")
+        // Get players birth month
+        interaction.reply("What month is your birthday (1-12)?")
+        interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
+          .then((collected) => {
+            month = Math.floor(collected.first().content)
 
-            // Check if birth day is valid with corresponding month
-            message.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
-              .then(async (collected) => {
-                day = Math.floor(collected.first().content)
-                if(day > 0 && day <= 31){
-                  if(month === 2){
-                    if(day > 0 && day <=28)
-                      collected.first().reply(birthday.addBirthday(userId, month, day));
-                    else 
-                    collected.first().reply("Error: Invalid input")
+            // Get players birth day depending on month
+            if(month > 0  && month <= 12){
+              if(month === 2){
+                collected.first().reply("What day were you born on (1-28)")
+              }
+              else if (month === 4 || month === 6 || month === 9 || month === 11){
+                collected.first().reply("What day were you born on (1-30)")
+              }
+              else 
+              collected.first().reply("What day were you born on (1-31)")
+
+              // Check if birth day is valid with corresponding month
+              interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
+                .then(async (collected) => {
+                  day = Math.floor(collected.first().content)
+                  if(day > 0 && day <= 31){
+                    if(month === 2){
+                      if(day > 0 && day <=28)
+                        collected.first().reply(birthday.addBirthday(userId, month, day));
+                      else 
+                      collected.first().reply("Error: Invalid input")
+                    }
+                    if(month === 4 || month === 6 || month === 9 || month === 11) {
+                      if (day > 0 && day <= 30)
+                      collected.first().reply(birthday.addBirthday(userId, month, day))
+                      else 
+                      collected.first().reply("Error: Invalid input")
+                    }
+                    if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month == 10 || month == 12) {
+                      collected.first().reply(birthday.addBirthday(userId, month, day))
+                    }
                   }
-                  if(month === 4 || month === 6 || month === 9 || month === 11) {
-                    if (day > 0 && day <= 30)
-                    collected.first().reply(birthday.addBirthday(userId, month, day))
-                    else 
-                    collected.first().reply("Error: Invalid input")
-                  }
-                  if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month == 10 || month == 12) {
-                    collected.first().reply(birthday.addBirthday(userId, month, day))
-                  }
-                }
-                else 
-                collected.first().reply("Error: Invalid input")
-              })
-              .catch((err) =>{
-                console.log(err)
-                message.channel.send("Error: Timed out")
-              })
+                  else 
+                  collected.first().reply("Error: Invalid input")
+                })
+                .catch((err) =>{
+                  console.log(err)
+                  interaction.channel.send("Error: Timed out")
+                })
+              }
+              else 
+                interaction.channel.send("Error: Invalid input")
+          })
+          .catch((err) =>{
+            console.log(err)
+            interaction.channel.send("Error: Timed out")
+          })
+          setTimeout(async () => {
+            const channel = await client.channels.fetch(process.env.generalID)
+            var user = await birthday.checkBirthday()
+
+            if(user != null){
+              channel.send({content: `Happy Birthday, <@${user}>!`})
             }
-            else 
-              message.channel.send("Error: Invalid input")
-        })
-        .catch((err) =>{
-          console.log(err)
-          message.channel.send("Error: Timed out")
-        })
-        setTimeout(async () => {
-          const channel = await client.channels.fetch('689184769677983774')
-          var user = await birthday.checkBirthday()
-
-          if(user != null){
-            channel.send({content: `Happy Birthday, <@${user}>!`})
-          }
-        },7000)
-      
-
+          },7000)
+      }
     }
   }
 })
 
 // REMOVE BIRTHDAY
-client.on("messageCreate", async (message) => {
-  if(message.content.toLowerCase() === '!removebirthday') {
-    message.channel.send(await birthday.removeBirthday(message.author.id))
+client.on("interactionCreate", async (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'removebirthday')
+    {
+      interaction.reply(await birthday.removeBirthday(interaction.user.id))
+    }
   }
 })
 
 // FIND BIRTHDAY
-client.on("messageCreate", async (message) => {
-  let msg = message.content.toLowerCase()
-  if(msg.substring(0,13) === '!findbirthday') {
-  let mentionedUser = message.mentions.users.first().id
+client.on("interactionCreate", (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'findbirthday') {
+      interaction.reply("Whos birthday would you like to find? (@username)")
 
-    if (!mentionedUser) {
-      message.reply('Please type command followed by @ (i.e. !findbirthday @playerName)')
-    } 
-    else {
-      message.reply(await birthday.findBirthday(mentionedUser))
-    }
+      const filter = (m) => interaction.user.id === m.author.id;
+
+      interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
+        .then (async (collected) => {
+          let mentionedUser = collected.first().mentions.users.first()
+
+          if(!mentionedUser) {
+            interaction.channel.send("Invalid input")
+          }
+          else{
+            let msg = await birthday.findBirthday(mentionedUser)
+            collected.first().reply(msg)
+          }
+        })
+        .catch((err) =>{
+          console.log(err)
+          interaction.channel.send("Error: Timed out")
+        })
+      }
   }
 })
 
@@ -143,7 +202,7 @@ client.on("messageCreate", async (message) => {
 async function checkBirthday() {
   var date = new Date()
   if(date.getHours() === 7 && date.getMinutes() === 0){
-    const channel = await client.channels.fetch('689184769677983774')
+    const channel = await client.channels.fetch(process.env.generalID)
     var user = await birthday.checkBirthday()
     
     if(user != null){
@@ -154,11 +213,13 @@ async function checkBirthday() {
 
 
 // PICK GAME 
-client.on("messageCreate", (message) => {
-  if(message.content.toLowerCase() === '!pickgame'){
-    let games = ['Apex', 'Valorant', 'Overwatch', 'Plateup', 'Devour', 'Roblox']
+client.on('interactionCreate', (interaction) => {
+  if(interaction.isChatInputCommand()){
+    if(interaction.commandName  === 'pickgame') {
+      let games = ['Apex', 'Valorant', 'Overwatch', 'Plateup', 'Devour', 'Roblox']
 
-    message.reply(gameSelect.pickGame(games))
+      interaction.reply({content: gameSelect.pickGame(games)})
+      }
     }
   })
 
@@ -168,16 +229,9 @@ client.on("messageCreate", (message) => {
     selectRole(member);
 });
 
-// add role
-client.on('messageCreate', (message) => {
-  if(message.content.toLowerCase() === "!addrole") {
-    selectRole(message.member)
-  }
-})
 
 function selectRole(member){
-  var channelID = "1037799265726115841"
-  var channel = member.guild.channels.cache.get(channelID);
+  var channel = member.guild.channels.cache.get(process.env.welcomeID);
 
    const roleSelector = new SelectMenuBuilder()
        .setCustomId("roles")
@@ -197,62 +251,58 @@ function selectRole(member){
  client.on(Events.InteractionCreate, async (interaction) => {
   if(interaction.isSelectMenu())
   {
-    const angeliaID = '733893079786061826'
-    const kevinID = '806625249009336391'
-    const brianID = '760685888665026563'
-    const alexId = '737099202282258544'
     if(interaction.customId === 'roles')
       for(let i = 0; i < interaction.values.length;i++){
         if(interaction.values[i] === 'angela'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === angeliaID){
+            if(interaction.member._roles[i] === process.env.angelaID){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add(angeliaID)
+            interaction.member.roles.add(process.env.angelaID)
           }
         }
         else if(interaction.values[i] === 'kevin'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === kevinID){
+            if(interaction.member._roles[i] === process.env.kevinID){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add(kevinID)
+            interaction.member.roles.add(process.env.kevinID)
           }
         }
         else if(interaction.values[i] === 'brian'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === brianID){
+            if(interaction.member._roles[i] === process.env.brianID){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add(brianID)
+            interaction.member.roles.add(process.env.brianID)
           }
         }
         else if(interaction.values[i] === 'alex'){
           let hasRole = false;
           for(let i = 0; i < interaction.member._roles.length; i++)
           {
-            if(interaction.member._roles[i] === alexId){
+            if(interaction.member._roles[i] === process.env.alexId){
               hasRole = true;
               break;
             }
           }
           if(hasRole === false){
-            interaction.member.roles.add(alexId)
+            interaction.member.roles.add(process.env.alexId)
           }
         }
       }
@@ -262,14 +312,15 @@ function selectRole(member){
 
 
 // show available bot commands
-client.on("messageCreate", (message) => {
-  if(message.content.toLowerCase() === '!commands') {
-    let commands = ['Commands:', '!addbirthday', '!removebirthday', '!findbirthday', '!pickgame', '!addrole']
-    let msg = ""
-    for(let i = 0; i < commands.length; i++){
-      msg += commands[i] + "\n"
+client.on("interactionCreate", (interaction) => {
+  if(interaction.isChatInputCommand) {
+    if(interaction.commandName === 'commands') {
+      let msg = ""
+      for(let i = 0; i < commands.length; i++){
+        msg += commands[i].name + "\n"
+      }
+      interaction.reply(msg)
     }
-    message.reply(msg)
   }
 })
 
