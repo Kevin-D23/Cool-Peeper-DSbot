@@ -6,6 +6,8 @@ const gameSelect = require('./commands/pickGame.js')
 const BirthdayObj = require('./models/birthdayModel')
 const mongoose = require('mongoose')
 const qotdURL = "https://zenquotes.io/api/today/"
+const weatherURL = "https://api.openweathermap.org/data/2.5/weather?zip="
+
 
 const client = new Client({ 
   intents: [
@@ -54,6 +56,10 @@ const commands = [
     {
       name: 'qotd',
       description: 'Display the quote of the day'
+    },
+    {
+      name: 'weather',
+      description: 'Check the current weather in any city'
     }
   ]
 
@@ -354,6 +360,41 @@ client.on("interactionCreate", (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'qotd') {
       interaction.reply(qotd)
+    }
+  }
+})
+
+// generate weather at desired zip code
+async function genWeather(zip) {
+  let weather = ""
+  const response = await fetch(weatherURL + zip + process.env.weatherID)
+    var data = await response.json();
+    if(data.cod === '400')
+      weather = "Invalid zip code"
+    else if(data.cod === '404')
+      weather = "City not found"
+    else {
+      weather = "Weather for " + data.name + "\n\nTemp: " +  Math.round(data.main.temp) + "°F\nHigh/Low: " + Math.round(data.main.temp_max) + "°F/" + Math.round(data.main.temp_min) + "°F\nHumidity: " + Math.round(data.main.humidity) + "%\nWind: " + Math.round(data.wind.speed) + "mph"
+    }
+    return weather
+}
+
+// display weather
+client.on('interactionCreate', (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'weather') {
+      let weather = ""
+      const filter = (m) => interaction.user.id === m.author.id;
+      interaction.reply("Please enter the city's zip code")
+      interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ['time']})
+        .then (async (collected) => {
+          weather = await genWeather(collected.first().content)
+          interaction.editReply(weather)
+        })
+        .catch((err) =>{
+          console.log(err)
+          interaction.channel.send("Error: Timed out")
+        })
     }
   }
 })
