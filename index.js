@@ -5,6 +5,7 @@ const birthday = require('./commands/birthday.js')
 const gameSelect = require('./commands/pickGame.js')
 const BirthdayObj = require('./models/birthdayModel')
 const mongoose = require('mongoose')
+const qotdURL = "https://zenquotes.io/api/today/"
 
 const client = new Client({ 
   intents: [
@@ -19,8 +20,11 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   client.user.setPresence({status: 'dnd', activities: [{name:  "with myself"}]})
   main();
+  setInterval(genQuote, 60000)
   setInterval(checkBirthday, 60000);
 });
+
+var qotd = ''
 
 const commands = [
     {
@@ -46,6 +50,10 @@ const commands = [
     {
       name: 'commands',
       description: 'Display list of commands'
+    },
+    {
+      name: 'qotd',
+      description: 'Display the quote of the day'
     }
   ]
 
@@ -320,6 +328,32 @@ client.on("interactionCreate", (interaction) => {
         msg += commands[i].name + "\n"
       }
       interaction.reply(msg)
+    }
+  }
+})
+
+
+// generate quote of the day
+async function genQuote() {
+  var date = new Date()
+  if(date.getHours() === 0) {
+    const response = await fetch(qotdURL)
+    var data = await response.json();
+    qotd = data[0].q
+  }
+  else if(qotd === ''){
+    const response = await fetch(qotdURL)
+    var data = await response.json();
+    qotd = '"' + data[0].q + '" - ' + data[0].a 
+  }
+}
+
+
+// Display quote of the day
+client.on("interactionCreate", (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'qotd') {
+      interaction.reply(qotd)
     }
   }
 })
