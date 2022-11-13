@@ -374,7 +374,7 @@ async function genWeather(zip) {
     else if(data.cod === '404')
       weather = "City not found"
     else {
-      weather = "Weather for " + data.name + "\n\nTemp: " +  Math.round(data.main.temp) + "°F\nHigh/Low: " + Math.round(data.main.temp_max) + "°F/" + Math.round(data.main.temp_min) + "°F\nHumidity: " + Math.round(data.main.humidity) + "%\nWind: " + Math.round(data.wind.speed) + "mph"
+      weather = "Weather for " + data.name + ", " + zip + "\n\nTemp: " +  Math.round(data.main.temp) + "°F\nHigh/Low: " + Math.round(data.main.temp_max) + "°F/" + Math.round(data.main.temp_min) + "°F\nHumidity: " + Math.round(data.main.humidity) + "%\nWind: " + Math.round(data.wind.speed) + "mph"
     }
     return weather
 }
