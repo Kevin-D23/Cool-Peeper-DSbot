@@ -68,7 +68,7 @@ const rest = new REST({version: '10'}).setToken(process.env.TOKEN)
 
 async function main() {
   try {
-    await rest.put(Routes.applicationGuildCommands(process.env.clientID, process.env.testServerID), {
+    await rest.put(Routes.applicationGuildCommands(process.env.clientID, process.env.guildID), {
       body: commands,
     }) 
   } catch(err) {
