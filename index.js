@@ -22,6 +22,7 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   client.user.setPresence({status: 'dnd', activities: [{name:  "with myself"}]})
   main();
+  test()
   setInterval(genQuote, 60000)
   setInterval(checkBirthday, 60000);
 });
@@ -69,6 +70,16 @@ const rest = new REST({version: '10'}).setToken(process.env.TOKEN)
 async function main() {
   try {
     await rest.put(Routes.applicationGuildCommands(process.env.clientID, process.env.guildID), {
+      body: commands,
+    }) 
+  } catch(err) {
+    console.log(err)
+  }
+}
+
+async function test() {
+  try {
+    await rest.put(Routes.applicationGuildCommands(process.env.clientID, process.env.testServerID), {
       body: commands,
     }) 
   } catch(err) {
