@@ -61,6 +61,10 @@ const commands = [
     {
       name: 'weather',
       description: 'Check the current weather in any city'
+    },
+    {
+      name: 'flipcoin',
+      description: 'Flip a coin'
     }
   ]
 
@@ -406,6 +410,21 @@ client.on('interactionCreate', (interaction) => {
           console.log(err)
           interaction.channel.send("Error: Timed out")
         })
+    }
+  }
+})
+
+
+// flip coin
+client.on('interactionCreate', (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'flipcoin') {
+      let result = Math.floor(Math.random() * 2)
+
+      if(result === 0)
+        interaction.reply('Heads')
+      else if(result === 1)
+        interaction.reply('Tails')
     }
   }
 })
