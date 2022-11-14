@@ -429,5 +429,14 @@ client.on('interactionCreate', (interaction) => {
   }
 })
 
+client.on('interactionCreate', (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'picktank') {
+      let msg = gameSelect.pickHero('tank')
+      interaction.reply(msg)
+    }
+  }
+})
+
 client.login(process.env.TOKEN)
 
