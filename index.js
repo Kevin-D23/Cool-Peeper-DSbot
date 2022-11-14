@@ -65,6 +65,10 @@ const commands = [
     {
       name: 'flipcoin',
       description: 'Flip a coin'
+    },
+    {
+      name: 'picktank',
+      description: 'Selects a random Overwatch tank'
     }
   ]
 
