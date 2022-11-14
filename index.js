@@ -2,8 +2,10 @@ require('dotenv/config')
 const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes} = require('discord.js');
 const {REST} = require('@discordjs/rest')
 const birthday = require('./commands/birthday.js')
+const gamble = require('./commands/gamble.js')
 const gameSelect = require('./commands/pickGame.js')
 const BirthdayObj = require('./models/birthdayModel')
+const GambleObj = require('./models/gambleModel')
 const mongoose = require('mongoose')
 const qotdURL = "https://zenquotes.io/api/today/"
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather?zip="
@@ -14,7 +16,8 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildPresences
   ] 
 });
 
@@ -25,6 +28,7 @@ client.on('ready', () => {
   test()
   setInterval(genQuote, 60000)
   setInterval(checkBirthday, 60000);
+  setInterval(dailyMoney, 60000)
 });
 
 var qotd = ''
@@ -77,6 +81,56 @@ const commands = [
     {
       name: 'picksupport',
       description: 'Selects a random Overwatch support'
+    },
+    {
+      name: 'gamble',
+      description: 'Bet on a coin flip',
+      options: [
+        {
+          name: 'bet',
+          description: 'Bet amount',
+          type: 10,
+          required: true
+        }, 
+        {
+          name: 'guess',
+          description: 'Guess heads or tails',
+          type: 3,
+          required: true,
+          choices: [
+            {
+              name: 'Heads',
+              value: 'heads'
+            },
+            {
+              name: 'Tails',
+              value: 'tails'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'balance',
+      description: 'Check how much money you have'
+    },
+    {
+      name: 'loan', 
+      description: 'Loan a friend some money to fullfill their filthy gambling needs',
+      options: [
+        {
+          name: 'user',
+          description: 'Select a user',
+          type: 6,
+          required: true
+        },
+        {
+          name: 'amount',
+          description: 'Loan amount',
+          type: 10,
+          required: true
+        }
+      ]
     }
   ]
 
@@ -265,10 +319,18 @@ client.on('interactionCreate', (interaction) => {
   })
 
 
-  // role selector
+  // role selector and adds player to gamble database
   client.on("guildMemberAdd", (member) => {
     selectRole(member);
+
+    gamble.addPlayer(member.user.id)
 });
+
+
+// remove player from gamble database when they leave
+client.on('guildMemberRemove', (member) => {
+  gamble.removePlayer(member.user.id)
+})
 
 
 function selectRole(member){
@@ -431,12 +493,8 @@ client.on('interactionCreate', (interaction) => {
 client.on('interactionCreate', (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'flipcoin') {
-      let result = Math.floor(Math.random() * 2)
-
-      if(result === 0)
-        interaction.reply('Heads')
-      else if(result === 1)
-        interaction.reply('Tails')
+      let result = gamble.coinFlip()
+      interaction.reply(result)
     }
   }
 })
@@ -467,6 +525,62 @@ client.on('interactionCreate', (interaction) => {
     if(interaction.commandName === 'picksupport') {
       let msg = gameSelect.pickHero('support')
       interaction.reply(msg)
+    }
+  }
+})
+
+// use money from database to gamble
+client.on('interactionCreate',  async (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'gamble') {
+      const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE']
+      const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time lose', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
+      if(await gamble.hasFunds(interaction.user.id, interaction.options.get('bet').value) === true) {
+        let result = gamble.coinFlip().toLowerCase()
+        if(interaction.options.get('guess').value === result) {
+          let msg = winMsg[Math.floor(Math.random() * winMsg.length)]
+          let newBalance = await gamble.updateBalance(interaction.user.id, interaction.options.get('bet').value)
+          interaction.reply('Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + msg + '\nNew balance: $' + newBalance)
+        }
+        else {
+          let msg = loseMsg[Math.floor(Math.random() * loseMsg.length)]
+          let newBalance = await gamble.updateBalance(interaction.user.id, 0 - interaction.options.get('bet').value)
+          interaction.reply('Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + msg + '\n New balance: $' + newBalance)
+        }
+      }
+      else 
+        interaction.reply("Insufficient funds")
+    }
+  }
+})
+
+// check player balance
+client.on('interactionCreate', async (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'balance') {
+      let result = await gamble.getBalance(interaction.user.id)
+      interaction.reply('You have $' + result)
+    }
+  }
+})
+
+function dailyMoney() {
+  var date = new Date()
+  if(date.getHours() === 0 && date.getMinutes() === 0) {
+    gamble.dailyMoney()
+  }
+}
+
+
+// loan a user some money
+client.on('interactionCreate', async (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'loan') {
+      let user = interaction.options.get('user').user.id
+      let amount = interaction.options.get('amount').value
+      await gamble.updateBalance(interaction.user.id, 0 - amount)
+      await gamble.updateBalance(user, amount)
+      interaction.reply({content: `<@${interaction.user.id}>` + ' -->  $' + amount + '  --> ' + `<@${user}>` + '\n\nTransfer completed'})
     }
   }
 })
