@@ -12,10 +12,10 @@ function pickHero(role) {
     if(role === 'tank') 
         return tanks[Math.floor(Math.random() * (tanks.length))]
     else if (role === 'dps') 
-        return tanks[Math.floor(Math.random() * (dps.length))]
+        return dps[Math.floor(Math.random() * (dps.length))]
     else if (role === 'support')
-        return tanks[Math.floor(Math.random() * (supports.length))]
+        return supports[Math.floor(Math.random() * (supports.length))]
 }
 
 module.exports.pickGame = pickGame;
-module.exports.pickHero = pickHero
+module.exports.pickHero = pickHero;

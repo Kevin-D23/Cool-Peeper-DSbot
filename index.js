@@ -75,7 +75,7 @@ const commands = [
       description: 'Selects a random Overwatch dps'
     },
     {
-      name: 'picktank',
+      name: 'picksupport',
       description: 'Selects a random Overwatch support'
     }
   ]
