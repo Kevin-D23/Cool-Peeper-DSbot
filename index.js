@@ -69,6 +69,14 @@ const commands = [
     {
       name: 'picktank',
       description: 'Selects a random Overwatch tank'
+    },
+    {
+      name: 'pickdps',
+      description: 'Selects a random Overwatch dps'
+    },
+    {
+      name: 'picktank',
+      description: 'Selects a random Overwatch support'
     }
   ]
 
@@ -433,10 +441,31 @@ client.on('interactionCreate', (interaction) => {
   }
 })
 
+// pick tank
 client.on('interactionCreate', (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'picktank') {
       let msg = gameSelect.pickHero('tank')
+      interaction.reply(msg)
+    }
+  }
+})
+
+// pick dps
+client.on('interactionCreate', (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'pickdps') {
+      let msg = gameSelect.pickHero('dps')
+      interaction.reply(msg)
+    }
+  }
+})
+
+// pick support
+client.on('interactionCreate', (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'picksupport') {
+      let msg = gameSelect.pickHero('support')
       interaction.reply(msg)
     }
   }
