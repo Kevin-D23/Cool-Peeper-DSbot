@@ -21,13 +21,22 @@ async function getBalance(Username) {
     return user.money
 }
 
-function coinFlip() {
-    let result = Math.floor(Math.random() * 2)
+async function coinFlip() {
+    let result = Math.floor(Math.random() * 100) + 1
+    let headsTailsStats = await Gamble.findOne({_id: '6373df608946ca2d379f4aa9'})
+    let currentHeads = parseInt(headsTailsStats.username)
+    let currentTails = headsTailsStats.money
 
-      if(result === 0)
+      if(result % 2 === 0) {
+        currentHeads += 1
+        await Gamble.updateOne({_id: '6373df608946ca2d379f4aa9'}, {$set: {username: currentHeads.toString()}})
         return 'Heads'
-      else if(result === 1)
+      }
+      else {
+        currentTails += 1
+        await Gamble.updateOne({_id: '6373df608946ca2d379f4aa9'}, {$set: {money: currentTails}})
         return 'Tails'
+      }
 }
 
 async function updateBalance(Username, amount) {
@@ -57,9 +66,15 @@ async function dailyMoney() {
     let cursor = await Gamble.collection.find()
     .forEach((doc) => {
         if(doc) {
-            updateBalance(doc.username, 200)
+            if(doc._id.valueOf() !== '6373df608946ca2d379f4aa9')
+                updateBalance(doc.username, 200)
         }
     })
+}
+
+async function coinStats() {
+    const result = await Gamble.findOne({_id: '6373df608946ca2d379f4aa9'})
+    return 'Heads: ' + result.username + '\nTails: ' + result.money
 }
 
 module.exports.hasFunds = hasFunds;
@@ -69,3 +84,4 @@ module.exports.updateBalance = updateBalance
 module.exports.addPlayer = addPlayer
 module.exports.removePlayer = removePlayer
 module.exports.dailyMoney = dailyMoney
+module.exports.coinStats = coinStats

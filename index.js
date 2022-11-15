@@ -167,6 +167,10 @@ const commands = [
           required: true
         }
       ]
+    },
+    {
+      name: 'coinstats',
+      description: 'Check stats of all coin flips'
     }
   ]
 
@@ -488,7 +492,7 @@ client.on('interactionCreate',  async (interaction) => {
     }
     // FLIP COIN
     else if(interaction.commandName === 'flipcoin') {
-      let result = gamble.coinFlip()
+      let result = await gamble.coinFlip()
       interaction.reply(result)
     }
     // check player balance
@@ -519,7 +523,14 @@ function dailyMoney() {
   }
 }
 
-
+client.on('interactionCreate', async (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'coinstats') {
+      let msg = await gamble.coinStats()
+      interaction.reply(msg)
+    }
+  }
+})
 
 client.login(process.env.TOKEN)
 
