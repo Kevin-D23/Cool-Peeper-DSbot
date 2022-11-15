@@ -469,7 +469,7 @@ client.on('interactionCreate',  async (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'gamble') {
       const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE']
-      const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time lose', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
+      const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time loser', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
       if(await gamble.hasFunds(interaction.user.id, interaction.options.get('bet').value) === true) {
         let result = gamble.coinFlip().toLowerCase()
         if(interaction.options.get('guess').value === result) {
@@ -480,7 +480,7 @@ client.on('interactionCreate',  async (interaction) => {
         else {
           let msg = loseMsg[Math.floor(Math.random() * loseMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, 0 - interaction.options.get('bet').value)
-          interaction.reply('Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + msg + '\n New balance: $' + newBalance)
+          interaction.reply('Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + msg + '\nNew balance: $' + newBalance)
         }
       }
       else 
