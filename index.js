@@ -1,5 +1,5 @@
 require('dotenv/config')
-const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes} = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes, EmbedBuilder, Embed} = require('discord.js');
 const {REST} = require('@discordjs/rest')
 const birthday = require('./commands/birthday.js')
 const gamble = require('./commands/gamble.js')
@@ -219,8 +219,15 @@ client.on("interactionCreate", async (interaction) => {
   if(interaction.isChatInputCommand()){
     if(interaction.commandName === 'addbirthday'){
       const result = await birthday.doesExist(interaction.user.id)
+      let embed = new EmbedBuilder()
+        .setTitle('Birthday Bot')
+        .setColor('#A93226')
+
       if(result != null){
-        interaction.reply("Birthday is already in database")
+        embed.setDescription("Birthday is already in database")
+        await interaction.reply({
+          embeds : [embed]
+        })
       }
       else {
         let userId = interaction.user.id
@@ -229,14 +236,23 @@ client.on("interactionCreate", async (interaction) => {
         let msg = ""
       
         if(month === 2 && day > 28){
-          interaction.reply('Invalid birthday')
+          embed.setDescription('Invalid birthday')
+          await interaction.reply({
+            embeds : [embed]
+          })
         }
         else if ((month === 4 || month === 6 || month === 9 || month === 11) && day > 30){
-          interaction.reply('Invalid birthday')
+          embed.setDescription('Invalid birthday')
+          await interaction.reply({
+            embeds : [embed]
+          })
         }
         else {
            msg = birthday.addBirthday(userId, month, day)
-           interaction.reply(msg)
+           embed.setDescription(msg)
+           await interaction.reply({
+            embeds : [embed]
+          })
         }
 
           setTimeout(async () => {
@@ -252,13 +268,26 @@ client.on("interactionCreate", async (interaction) => {
     // REMOVE BIRTHDAY
     else if(interaction.commandName === 'removebirthday')
     {
-      interaction.reply(await birthday.removeBirthday(interaction.user.id))
+      let msg = await birthday.removeBirthday(interaction.user.id)
+      let embed = new EmbedBuilder()
+        .setTitle('Birthday Bot')
+        .setDescription(msg)
+        .setColor('#A93226')
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
     // FIND BIRTHDAY
     else if(interaction.commandName === 'findbirthday') {
           let mentionedUser = interaction.options.get('user').user.id
           let msg = await birthday.findBirthday(mentionedUser)
-          interaction.reply(msg)
+          let embed = new EmbedBuilder()
+        .setTitle('Birthday Bot')
+        .setDescription(msg)
+        .setColor('#A93226')
+        await interaction.reply({
+          embeds : [embed]
+        })
         
       }
 
@@ -281,27 +310,51 @@ async function checkBirthday() {
 
 
 // PICK GAME 
-client.on('interactionCreate', (interaction) => {
+client.on('interactionCreate', async (interaction) => {
   if(interaction.isChatInputCommand()){
     if(interaction.commandName  === 'pickgame') {
       let games = ['Apex', 'Valorant', 'Overwatch', 'Plateup', 'Devour', 'Roblox']
-
-      interaction.reply({content: gameSelect.pickGame(games)})
+      let msg= gameSelect.pickGame(games)
+      let embed = new EmbedBuilder()
+        .setTitle('Game Selector')
+        .setDescription(msg)
+        .setColor('#A93226')
+        await interaction.reply({
+          embeds : [embed]
+        })
       }
       // PICK TANK
       else if(interaction.commandName === 'picktank') {
         let msg = gameSelect.pickHero('tank')
-        interaction.reply(msg)
+        let embed = new EmbedBuilder()
+        .setTitle('Birthday Bot')
+        .setDescription(msg)
+        .setColor('#A93226')
+        await interaction.reply({
+          embeds : [embed]
+        })
       }
       // PICK DPS
       else if(interaction.commandName === 'pickdps') {
         let msg = gameSelect.pickHero('dps')
-        interaction.reply(msg)
+        let embed = new EmbedBuilder()
+        .setTitle('Birthday Bot')
+        .setDescription(msg)
+        .setColor('#A93226')
+        await interaction.reply({
+          embeds : [embed]
+        })
       }
       // PICK SUPPORT
       else if(interaction.commandName === 'picksupport') {
         let msg = gameSelect.pickHero('support')
-        interaction.reply(msg)
+        let embed = new EmbedBuilder()
+        .setTitle('Birthday Bot')
+        .setDescription(msg)
+        .setColor('#A93226')
+        await interaction.reply({
+          embeds : [embed]
+        })
       }
     }
   })
@@ -403,14 +456,21 @@ function selectRole(member){
 
 
 // show available bot commands
-client.on("interactionCreate", (interaction) => {
+client.on("interactionCreate", async (interaction) => {
   if(interaction.isChatInputCommand) {
     if(interaction.commandName === 'commands') {
       let msg = ""
       for(let i = 0; i < commands.length; i++){
         msg += commands[i].name + "\n"
       }
-      interaction.reply(msg)
+      let embed = new EmbedBuilder()
+        .setTitle('Command List')
+        .setDescription(msg)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
   }
 })
@@ -433,10 +493,17 @@ async function genQuote() {
 
 
 // Display quote of the day
-client.on("interactionCreate", (interaction) => {
+client.on("interactionCreate", async (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'qotd') {
-      interaction.reply(qotd)
+      let embed = new EmbedBuilder()
+        .setTitle('Quote Of The Day')
+        .setDescription(qotd)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
   }
 })
@@ -451,7 +518,7 @@ async function genWeather(zip) {
     else if(data.cod === '404')
       weather = "City not found"
     else {
-      weather = "Weather for " + data.name + ", " + zip + "\n\nTemp: " +  Math.round(data.main.temp) + "°F\nHigh/Low: " + Math.round(data.main.temp_max) + "°F/" + Math.round(data.main.temp_min) + "°F\nHumidity: " + Math.round(data.main.humidity) + "%\nWind: " + Math.round(data.wind.speed) + "mph"
+      weather = "Weather for " + data.name + "\n\nTemp: " +  Math.round(data.main.temp) + "°F\nHigh/Low: " + Math.round(data.main.temp_max) + "°F/" + Math.round(data.main.temp_min) + "°F\nHumidity: " + Math.round(data.main.humidity) + "%\nWind: " + Math.round(data.wind.speed) + "mph"
     }
     return weather
 }
@@ -460,9 +527,14 @@ async function genWeather(zip) {
 client.on('interactionCreate', async (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'weather') {
-      let weather = ""
-          weather = await genWeather(interaction.options.get('zip').value)
-          interaction.reply(weather)
+      weather = await genWeather(interaction.options.get('zip').value)
+      let embed = new EmbedBuilder()
+      .setTitle('Weather: ' + interaction.options.get('zip').value) 
+      .setDescription(weather)
+      .setColor('#A93226')
+      await interaction.reply({
+        embeds: [embed]
+      })
     }
   }
 })
@@ -474,43 +546,91 @@ client.on('interactionCreate',  async (interaction) => {
     if(interaction.commandName === 'gamble') {
       const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE']
       const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time loser', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
+      let msg = ""
       if(await gamble.hasFunds(interaction.user.id, interaction.options.get('bet').value) === true) {
         let result = await gamble.coinFlip()
         if(interaction.options.get('guess').value === result) {
-          let msg = winMsg[Math.floor(Math.random() * winMsg.length)]
+          let win = winMsg[Math.floor(Math.random() * winMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, interaction.options.get('bet').value)
-          interaction.reply('Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + msg + '\nNew balance: $' + newBalance)
+          msg = 'Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + win + '\nNew balance: $' + newBalance
         }
         else {
-          let msg = loseMsg[Math.floor(Math.random() * loseMsg.length)]
+          let lose = loseMsg[Math.floor(Math.random() * loseMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, 0 - interaction.options.get('bet').value)
-          interaction.reply('Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + msg + '\nNew balance: $' + newBalance)
+          msg = 'Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + lose + '\nNew balance: $' + newBalance
         }
       }
       else 
-        interaction.reply("Insufficient funds")
+        msg = 'Insufficient funds'
+
+        let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setDescription(msg)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
     // FLIP COIN
     else if(interaction.commandName === 'flipcoin') {
       let result = await gamble.coinFlip()
-      interaction.reply(result)
+      let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setDescription(result)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
     // check player balance
     else if(interaction.commandName === 'balance') {
       let result = await gamble.getBalance(interaction.user.id)
-      interaction.reply('You have $' + result)
+      let msg = 'You have $' + result
+      let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setDescription(msg)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
     // lone a user some money
     else if(interaction.commandName === 'loan') {
       let user = interaction.options.get('user').user.id
       let amount = interaction.options.get('amount').value
+      let msg = ""
       if(await gamble.hasFunds(interaction.user.id, amount)) {
         await gamble.updateBalance(interaction.user.id, 0 - amount)
         await gamble.updateBalance(user, amount)
-        interaction.reply({content: `<@${interaction.user.id}>` + ' -->  $' + amount + '  --> ' + `<@${user}>` + '\n\nTransfer completed'})
+        msg = `<@${interaction.user.id}>` + ' -->  $' + amount + '  --> ' + `<@${user}>` + '\n\nTransfer completed'
       }
       else 
-        interaction.reply('Insufficient funds')
+        msg = 'Insufficient funds'
+
+        let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setDescription(msg)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
+    }
+
+    // coin flip stats
+    else if(interaction.commandName === 'coinstats') {
+      let msg = await gamble.coinStats()
+      let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setDescription(msg)
+        .setColor('#A93226')
+
+        await interaction.reply({
+          embeds : [embed]
+        })
     }
   }
 })
@@ -523,14 +643,7 @@ function dailyMoney() {
   }
 }
 
-client.on('interactionCreate', async (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'coinstats') {
-      let msg = await gamble.coinStats()
-      interaction.reply(msg)
-    }
-  }
-})
+
 
 client.login(process.env.TOKEN)
 
