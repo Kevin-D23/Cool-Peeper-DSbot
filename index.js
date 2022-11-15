@@ -504,7 +504,7 @@ client.on('interactionCreate',  async (interaction) => {
     else if(interaction.commandName === 'loan') {
       let user = interaction.options.get('user').user.id
       let amount = interaction.options.get('amount').value
-      if(gamble.hasFunds(interaction.user.id, amount)) {
+      if(await gamble.hasFunds(interaction.user.id, amount)) {
         await gamble.updateBalance(interaction.user.id, 0 - amount)
         await gamble.updateBalance(user, amount)
         interaction.reply({content: `<@${interaction.user.id}>` + ' -->  $' + amount + '  --> ' + `<@${user}>` + '\n\nTransfer completed'})
