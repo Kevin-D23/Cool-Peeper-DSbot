@@ -22,12 +22,12 @@ async function getBalance(Username) {
 }
 
 async function coinFlip() {
-    let result = Math.floor(Math.random() * 100) + 1
+    let result = Math.floor(Math.random() * 2)
     let headsTailsStats = await Gamble.findOne({_id: '6373df608946ca2d379f4aa9'})
     let currentHeads = parseInt(headsTailsStats.username)
     let currentTails = headsTailsStats.money
 
-      if(result % 2 === 0) {
+      if(result === 1) {
         currentHeads += 1
         await Gamble.updateOne({_id: '6373df608946ca2d379f4aa9'}, {$set: {username: currentHeads.toString()}})
         return 'heads'
