@@ -434,7 +434,7 @@ async function genQuote() {
   if(date.getHours() === 0) {
     const response = await fetch(qotdURL)
     var data = await response.json();
-    qotd = data[0].q
+    qotd = '"' + data[0].q + '" - ' + data[0].a 
   }
   else if(qotd === ''){
     const response = await fetch(qotdURL)
