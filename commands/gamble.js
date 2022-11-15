@@ -30,12 +30,12 @@ async function coinFlip() {
       if(result % 2 === 0) {
         currentHeads += 1
         await Gamble.updateOne({_id: '6373df608946ca2d379f4aa9'}, {$set: {username: currentHeads.toString()}})
-        return 'Heads'
+        return 'heads'
       }
       else {
         currentTails += 1
         await Gamble.updateOne({_id: '6373df608946ca2d379f4aa9'}, {$set: {money: currentTails}})
-        return 'Tails'
+        return 'tails'
       }
 }
 

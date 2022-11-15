@@ -475,7 +475,7 @@ client.on('interactionCreate',  async (interaction) => {
       const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE']
       const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time loser', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
       if(await gamble.hasFunds(interaction.user.id, interaction.options.get('bet').value) === true) {
-        let result = await gamble.coinFlip().toLowerCase()
+        let result = await gamble.coinFlip()
         if(interaction.options.get('guess').value === result) {
           let msg = winMsg[Math.floor(Math.random() * winMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, interaction.options.get('bet').value)
