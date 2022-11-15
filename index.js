@@ -252,23 +252,13 @@ client.on("interactionCreate", async (interaction) => {
           },7000)
       }
     }
-  }
-})
-
-// REMOVE BIRTHDAY
-client.on("interactionCreate", async (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'removebirthday')
+    // REMOVE BIRTHDAY
+    else if(interaction.commandName === 'removebirthday')
     {
       interaction.reply(await birthday.removeBirthday(interaction.user.id))
     }
-  }
-})
-
-// FIND BIRTHDAY
-client.on("interactionCreate", (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'findbirthday') {
+    // FIND BIRTHDAY
+    else if(interaction.commandName === 'findbirthday') {
       interaction.reply("Whos birthday would you like to find? (@username)")
 
       const filter = (m) => interaction.user.id === m.author.id;
@@ -290,8 +280,10 @@ client.on("interactionCreate", (interaction) => {
           interaction.channel.send("Error: Timed out")
         })
       }
+
   }
 })
+
 
 // CHECK BIRTHDAY
 async function checkBirthday() {
@@ -314,6 +306,21 @@ client.on('interactionCreate', (interaction) => {
       let games = ['Apex', 'Valorant', 'Overwatch', 'Plateup', 'Devour', 'Roblox']
 
       interaction.reply({content: gameSelect.pickGame(games)})
+      }
+      // PICK TANK
+      else if(interaction.commandName === 'picktank') {
+        let msg = gameSelect.pickHero('tank')
+        interaction.reply(msg)
+      }
+      // PICK DPS
+      else if(interaction.commandName === 'pickdps') {
+        let msg = gameSelect.pickHero('dps')
+        interaction.reply(msg)
+      }
+      // PICK SUPPORT
+      else if(interaction.commandName === 'picksupport') {
+        let msg = gameSelect.pickHero('support')
+        interaction.reply(msg)
       }
     }
   })
@@ -489,46 +496,6 @@ client.on('interactionCreate', (interaction) => {
 })
 
 
-// flip coin
-client.on('interactionCreate', (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'flipcoin') {
-      let result = gamble.coinFlip()
-      interaction.reply(result)
-    }
-  }
-})
-
-// pick tank
-client.on('interactionCreate', (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'picktank') {
-      let msg = gameSelect.pickHero('tank')
-      interaction.reply(msg)
-    }
-  }
-})
-
-// pick dps
-client.on('interactionCreate', (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'pickdps') {
-      let msg = gameSelect.pickHero('dps')
-      interaction.reply(msg)
-    }
-  }
-})
-
-// pick support
-client.on('interactionCreate', (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'picksupport') {
-      let msg = gameSelect.pickHero('support')
-      interaction.reply(msg)
-    }
-  }
-})
-
 // use money from database to gamble
 client.on('interactionCreate',  async (interaction) => {
   if(interaction.isChatInputCommand()) {
@@ -551,18 +518,27 @@ client.on('interactionCreate',  async (interaction) => {
       else 
         interaction.reply("Insufficient funds")
     }
-  }
-})
-
-// check player balance
-client.on('interactionCreate', async (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'balance') {
+    // FLIP COIN
+    else if(interaction.commandName === 'flipcoin') {
+      let result = gamble.coinFlip()
+      interaction.reply(result)
+    }
+    // check player balance
+    else if(interaction.commandName === 'balance') {
       let result = await gamble.getBalance(interaction.user.id)
       interaction.reply('You have $' + result)
     }
+    // lone a user some money
+    else if(interaction.commandName === 'loan') {
+      let user = interaction.options.get('user').user.id
+      let amount = interaction.options.get('amount').value
+      await gamble.updateBalance(interaction.user.id, 0 - amount)
+      await gamble.updateBalance(user, amount)
+      interaction.reply({content: `<@${interaction.user.id}>` + ' -->  $' + amount + '  --> ' + `<@${user}>` + '\n\nTransfer completed'})
+    }
   }
 })
+
 
 function dailyMoney() {
   var date = new Date()
@@ -572,18 +548,6 @@ function dailyMoney() {
 }
 
 
-// loan a user some money
-client.on('interactionCreate', async (interaction) => {
-  if(interaction.isChatInputCommand()) {
-    if(interaction.commandName === 'loan') {
-      let user = interaction.options.get('user').user.id
-      let amount = interaction.options.get('amount').value
-      await gamble.updateBalance(interaction.user.id, 0 - amount)
-      await gamble.updateBalance(user, amount)
-      interaction.reply({content: `<@${interaction.user.id}>` + ' -->  $' + amount + '  --> ' + `<@${user}>` + '\n\nTransfer completed'})
-    }
-  }
-})
 
 client.login(process.env.TOKEN)
 
