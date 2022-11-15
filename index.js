@@ -45,6 +45,24 @@ const commands = [
     {
       name: 'addbirthday',
       description: 'Add your birthday to the database',
+      options: [
+        {
+          name: 'month',
+          description: 'Enter birth month',
+          type: 4,
+          min_value: 1,
+          max_value: 12,
+          required: true,
+        },
+        {
+          name: 'day',
+          description: 'Enter birth day',
+          type: 4,
+          min_value: 1,
+          max_value: 31,
+          required: true,
+        }
+      ]
     },
     {
       name: 'removebirthday', 
@@ -52,7 +70,15 @@ const commands = [
     },
     {
       name: 'findbirthday',
-      description: 'Find the date of someones birthday'
+      description: 'Find the date of someones birthday',
+      options: [
+        {
+          name: 'user',
+          description: 'Select a user',
+          type: 6,
+          required: true
+        }
+      ]
     },
     {
       name: 'commands',
@@ -64,7 +90,15 @@ const commands = [
     },
     {
       name: 'weather',
-      description: 'Check the current weather in any city'
+      description: 'Check the current weather in any city',
+      options: [
+        {
+          name: 'zip',
+          description: 'Zip code',
+          type: 10,
+          required: true
+        }
+      ]
     },
     {
       name: 'flipcoin',
@@ -90,6 +124,7 @@ const commands = [
           name: 'bet',
           description: 'Bet amount',
           type: 10,
+          min_value: 0,
           required: true
         }, 
         {
@@ -128,6 +163,7 @@ const commands = [
           name: 'amount',
           description: 'Loan amount',
           type: 10,
+          min_value: 0,
           required: true
         }
       ]
@@ -183,65 +219,22 @@ client.on("interactionCreate", async (interaction) => {
         interaction.reply("Birthday is already in database")
       }
       else {
-        month = Number;
-        day = Number;
-        userId = interaction.user.id
+        let userId = interaction.user.id
+        let month = interaction.options.get('month').value
+        let day = interaction.options.get('day').value
+        let msg = ""
+      
+        if(month === 2 && day > 28){
+          interaction.reply('Invalid birthday')
+        }
+        else if ((month === 4 || month === 6 || month === 9 || month === 11) && day > 30){
+          interaction.reply('Invalid birthday')
+        }
+        else {
+           msg = birthday.addBirthday(userId, month, day)
+           interaction.reply(msg)
+        }
 
-        const filter = (m) => interaction.user.id === m.author.id;
-
-        // Get players birth month
-        interaction.reply("What month is your birthday (1-12)?")
-        interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
-          .then((collected) => {
-            month = Math.floor(collected.first().content)
-
-            // Get players birth day depending on month
-            if(month > 0  && month <= 12){
-              if(month === 2){
-                collected.first().reply("What day were you born on (1-28)")
-              }
-              else if (month === 4 || month === 6 || month === 9 || month === 11){
-                collected.first().reply("What day were you born on (1-30)")
-              }
-              else 
-              collected.first().reply("What day were you born on (1-31)")
-
-              // Check if birth day is valid with corresponding month
-              interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
-                .then(async (collected) => {
-                  day = Math.floor(collected.first().content)
-                  if(day > 0 && day <= 31){
-                    if(month === 2){
-                      if(day > 0 && day <=28)
-                        collected.first().reply(birthday.addBirthday(userId, month, day));
-                      else 
-                      collected.first().reply("Error: Invalid input")
-                    }
-                    if(month === 4 || month === 6 || month === 9 || month === 11) {
-                      if (day > 0 && day <= 30)
-                      collected.first().reply(birthday.addBirthday(userId, month, day))
-                      else 
-                      collected.first().reply("Error: Invalid input")
-                    }
-                    if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month == 10 || month == 12) {
-                      collected.first().reply(birthday.addBirthday(userId, month, day))
-                    }
-                  }
-                  else 
-                  collected.first().reply("Error: Invalid input")
-                })
-                .catch((err) =>{
-                  console.log(err)
-                  interaction.channel.send("Error: Timed out")
-                })
-              }
-              else 
-                interaction.channel.send("Error: Invalid input")
-          })
-          .catch((err) =>{
-            console.log(err)
-            interaction.channel.send("Error: Timed out")
-          })
           setTimeout(async () => {
             const channel = await client.channels.fetch(process.env.generalID)
             var user = await birthday.checkBirthday()
@@ -259,26 +252,10 @@ client.on("interactionCreate", async (interaction) => {
     }
     // FIND BIRTHDAY
     else if(interaction.commandName === 'findbirthday') {
-      interaction.reply("Whos birthday would you like to find? (@username)")
-
-      const filter = (m) => interaction.user.id === m.author.id;
-
-      interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ["time"]})
-        .then (async (collected) => {
-          let mentionedUser = collected.first().mentions.users.first()
-
-          if(!mentionedUser) {
-            interaction.channel.send("Invalid input")
-          }
-          else{
-            let msg = await birthday.findBirthday(mentionedUser)
-            collected.first().reply(msg)
-          }
-        })
-        .catch((err) =>{
-          console.log(err)
-          interaction.channel.send("Error: Timed out")
-        })
+          let mentionedUser = interaction.options.get('user').user.id
+          let msg = await birthday.findBirthday(mentionedUser)
+          interaction.reply(msg)
+        
       }
 
   }
@@ -476,21 +453,12 @@ async function genWeather(zip) {
 }
 
 // display weather
-client.on('interactionCreate', (interaction) => {
+client.on('interactionCreate', async (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'weather') {
       let weather = ""
-      const filter = (m) => interaction.user.id === m.author.id;
-      interaction.reply("Please enter the city's zip code")
-      interaction.channel.awaitMessages({filter, max: 1, time: 10000, errors: ['time']})
-        .then (async (collected) => {
-          weather = await genWeather(collected.first().content)
-          interaction.editReply(weather)
-        })
-        .catch((err) =>{
-          console.log(err)
-          interaction.channel.send("Error: Timed out")
-        })
+          weather = await genWeather(interaction.options.get('zip').value)
+          interaction.reply(weather)
     }
   }
 })
