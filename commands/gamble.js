@@ -77,6 +77,22 @@ async function coinStats() {
     return 'Heads: ' + result.username + '\nTails: ' + result.money
 }
 
+async function leaderboardUsers() {
+    let users = new Array(5)
+    let result = await Gamble.find().sort({money: -1})   
+    for(i = 0; i < users.length; i++)
+        users[i] = result[i].username
+    return users
+}
+
+async function leaderboardMoney() {
+    let bal = new Array(5)
+    let result = await Gamble.find().sort({money: -1})   
+    for(i = 0; i < bal.length; i++)
+        bal[i] = result[i].money
+    return bal
+}
+
 module.exports.hasFunds = hasFunds;
 module.exports.getBalance = getBalance;
 module.exports.coinFlip = coinFlip
@@ -85,3 +101,5 @@ module.exports.addPlayer = addPlayer
 module.exports.removePlayer = removePlayer
 module.exports.dailyMoney = dailyMoney
 module.exports.coinStats = coinStats
+module.exports.leaderboardUsers = leaderboardUsers
+module.exports.leaderboardMoney = leaderboardMoney

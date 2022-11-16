@@ -179,6 +179,10 @@ const commands = [
     {
       name: 'coinstats',
       description: 'Check stats of all coin flips'
+    },
+    {
+      name: 'leaderboard',
+      description: 'Check the casino\'s top 5'
     }
   ]
 
@@ -663,6 +667,33 @@ function dailyMoney() {
 }
 
 
+client.on('interactionCreate', async (interaction) => {
+  if(interaction.isChatInputCommand()) {
+    if(interaction.commandName === 'leaderboard') {
+      let users = await gamble.leaderboardUsers()
+      let balances = await gamble.leaderboardMoney()
+      let msg = ""
+      let currentUser
+      let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setColor('#A93226')
+    
+
+      for(i = 0; i < users.length; i++){
+        console.log(users[i])
+        currentUser = await interaction.guild.members.fetch(users[i])
+        msg += (i + 1) + '. ' + currentUser.user.username + '  -->  $' + balances[i] + '\n'
+      }
+
+      embed.setDescription(msg)
+
+        await interaction.reply({
+          embeds : [embed]
+        })
+
+    }
+  }
+})
 
 client.login(process.env.TOKEN)
 
