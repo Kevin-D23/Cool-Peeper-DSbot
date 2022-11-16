@@ -233,7 +233,7 @@ client.on("interactionCreate", async (interaction) => {
       const result = await birthday.doesExist(interaction.user.id)
       let embed = new EmbedBuilder()
         .setTitle('Birthday Bot')
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
       if(result != null){
         embed.setDescription("Birthday is already in database")
@@ -284,7 +284,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle('Birthday Bot')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
         await interaction.reply({
           embeds : [embed]
         })
@@ -296,7 +296,7 @@ client.on("interactionCreate", async (interaction) => {
           let embed = new EmbedBuilder()
         .setTitle('Birthday Bot')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
         await interaction.reply({
           embeds : [embed]
         })
@@ -330,7 +330,7 @@ client.on('interactionCreate', async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle('Game Selector')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
         await interaction.reply({
           embeds : [embed]
         })
@@ -341,7 +341,7 @@ client.on('interactionCreate', async (interaction) => {
         let embed = new EmbedBuilder()
         .setTitle('Birthday Bot')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
         await interaction.reply({
           embeds : [embed]
         })
@@ -352,7 +352,7 @@ client.on('interactionCreate', async (interaction) => {
         let embed = new EmbedBuilder()
         .setTitle('Birthday Bot')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
         await interaction.reply({
           embeds : [embed]
         })
@@ -363,7 +363,7 @@ client.on('interactionCreate', async (interaction) => {
         let embed = new EmbedBuilder()
         .setTitle('Birthday Bot')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
         await interaction.reply({
           embeds : [embed]
         })
@@ -478,7 +478,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle('Command List')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
         await interaction.reply({
           embeds : [embed]
@@ -511,7 +511,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle('Quote Of The Day')
         .setDescription(qotd)
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
         await interaction.reply({
           embeds : [embed]
@@ -543,7 +543,7 @@ client.on('interactionCreate', async (interaction) => {
       let embed = new EmbedBuilder()
       .setTitle('Weather: ' + interaction.options.get('zip').value) 
       .setDescription(weather)
-      .setColor('#A93226')
+      .setColor('#3498DB')
       await interaction.reply({
         embeds: [embed]
       })
@@ -559,14 +559,18 @@ client.on('interactionCreate',  async (interaction) => {
       const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE']
       const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time loser', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
       let msg = ""
+      let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
       if(await gamble.hasFunds(interaction.user.id, interaction.options.get('bet').value) === true) {
         let result = await gamble.coinFlip()
         if(interaction.options.get('guess').value === result) {
+          embed.setColor('#2ECC71')
           let win = winMsg[Math.floor(Math.random() * winMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, interaction.options.get('bet').value)
           msg = 'Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + win + '\nNew balance: $' + newBalance
         }
         else {
+          embed.setColor('#E74C3C')
           let lose = loseMsg[Math.floor(Math.random() * loseMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, 0 - interaction.options.get('bet').value)
           msg = 'Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + lose + '\nNew balance: $' + newBalance
@@ -575,10 +579,7 @@ client.on('interactionCreate',  async (interaction) => {
       else 
         msg = 'Insufficient funds'
 
-        let embed = new EmbedBuilder()
-        .setTitle('Peep Casino')
-        .setDescription(msg)
-        .setColor('#A93226')
+        embed.setDescription(msg)
 
         await interaction.reply({
           embeds : [embed]
@@ -590,7 +591,7 @@ client.on('interactionCreate',  async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
         .setDescription(result)
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
         await interaction.reply({
           embeds : [embed]
@@ -604,7 +605,7 @@ client.on('interactionCreate',  async (interaction) => {
 
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
       if(mentionedUser == null) {
         result = await gamble.getBalance(interaction.user.id)
@@ -636,7 +637,7 @@ client.on('interactionCreate',  async (interaction) => {
         let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
         await interaction.reply({
           embeds : [embed]
@@ -649,7 +650,7 @@ client.on('interactionCreate',  async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
         .setDescription(msg)
-        .setColor('#A93226')
+        .setColor('#3498DB')
 
         await interaction.reply({
           embeds : [embed]
@@ -676,7 +677,7 @@ client.on('interactionCreate', async (interaction) => {
       let currentUser
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
-        .setColor('#A93226')
+        .setColor('#3498DB')
     
 
       for(i = 0; i < users.length; i++){
