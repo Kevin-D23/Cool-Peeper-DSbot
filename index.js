@@ -147,7 +147,15 @@ const commands = [
     },
     {
       name: 'balance',
-      description: 'Check how much money you have'
+      description: 'Check how much money you have',
+      options: [
+        {
+          name: 'user',
+          description: 'Add user if you would like to check their balance',
+          type: 6,
+          required: false
+        }
+      ]
     },
     {
       name: 'loan', 
@@ -586,13 +594,24 @@ client.on('interactionCreate',  async (interaction) => {
     }
     // check player balance
     else if(interaction.commandName === 'balance') {
-      let result = await gamble.getBalance(interaction.user.id)
-      let msg = 'You have $' + result
+      let result
+      let mentionedUser = interaction.options.get('user')
+      let msg
+
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
-        .setDescription(msg)
         .setColor('#A93226')
 
+      if(mentionedUser == null) {
+        result = await gamble.getBalance(interaction.user.id)
+        msg = 'You have $' + result
+      }
+      else {
+        result = await gamble.getBalance(mentionedUser.user.id)
+        msg = 'They have $' + result
+      }
+
+       embed.setDescription(msg)
         await interaction.reply({
           embeds : [embed]
         })
