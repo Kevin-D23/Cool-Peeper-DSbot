@@ -77,7 +77,7 @@ async function coinStats() {
     const heads = parseInt(result.username)
     const tails = result.money
     const headsPerc = Math.round((heads / (heads + tails)) * 100)
-    const tailsPerc = 1 - headsPerc
+    const tailsPerc = 100 - headsPerc
     return 'Heads: ' + heads + ' %' + headsPerc + '\nTails: ' + tails + ' %' + tailsPerc
 }
 
