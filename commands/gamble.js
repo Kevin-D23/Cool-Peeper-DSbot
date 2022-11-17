@@ -74,7 +74,11 @@ async function dailyMoney() {
 
 async function coinStats() {
     const result = await Gamble.findOne({_id: '6373df608946ca2d379f4aa9'})
-    return 'Heads: ' + result.username + '\nTails: ' + result.money
+    const heads = parseInt(result.username)
+    const tails = result.money
+    const headsPerc = Math.round(heads / (heads + tails))
+    const tailsPerc = 1 - headsPerc
+    return 'Heads: ' + heads + ' %' + headsPerc + '\nTails: ' + tails + ' %' + tailsPerc
 }
 
 async function leaderboardUsers() {
