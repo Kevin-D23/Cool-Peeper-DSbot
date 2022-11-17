@@ -76,7 +76,7 @@ async function coinStats() {
     const result = await Gamble.findOne({_id: '6373df608946ca2d379f4aa9'})
     const heads = parseInt(result.username)
     const tails = result.money
-    const headsPerc = Math.round(heads / (heads + tails))
+    const headsPerc = Math.round((heads / (heads + tails)) * 10)
     const tailsPerc = 1 - headsPerc
     return 'Heads: ' + heads + ' %' + headsPerc + '\nTails: ' + tails + ' %' + tailsPerc
 }
