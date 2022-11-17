@@ -613,7 +613,7 @@ client.on('interactionCreate',  async (interaction) => {
       }
       else {
         result = await gamble.getBalance(mentionedUser.user.id)
-        msg = 'They have $' + result
+        msg = mentionedUser.user.username + ' has $' + result
       }
 
        embed.setDescription(msg)
