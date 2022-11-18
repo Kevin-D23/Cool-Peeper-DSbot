@@ -97,6 +97,21 @@ async function leaderboardMoney() {
     return bal
 }
 
+async function winLoss (user, gameResult) {
+    let wins = await Gamble.findOne({username: user})
+    let losses = await Gamble.findOne({username: user})
+    wins = wins.win
+    losses = losses.loss
+    let winrate
+    if(gameResult === 'win')
+        await Gamble.updateOne({username: user}, {$set: {win: wins + 1}})
+    else if(gameResult === 'lose')
+        await Gamble.updateOne({username: user}, {$set: {loss: losses + 1}})
+
+    winrate = Math.round((wins / (wins + losses)) * 100)
+    return winrate
+}
+
 module.exports.hasFunds = hasFunds;
 module.exports.getBalance = getBalance;
 module.exports.coinFlip = coinFlip
@@ -107,3 +122,4 @@ module.exports.dailyMoney = dailyMoney
 module.exports.coinStats = coinStats
 module.exports.leaderboardUsers = leaderboardUsers
 module.exports.leaderboardMoney = leaderboardMoney
+module.exports.winLoss = winLoss

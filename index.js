@@ -1,5 +1,5 @@
 require('dotenv/config')
-const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes, EmbedBuilder, Embed, Partials, PartialTextBasedChannel} = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes, EmbedBuilder, Embed, Partials, PartialTextBasedChannel, MessageFlags} = require('discord.js');
 const {REST} = require('@discordjs/rest')
 const birthday = require('./commands/birthday.js')
 const gamble = require('./commands/gamble.js')
@@ -586,12 +586,14 @@ client.on('interactionCreate',  async (interaction) => {
         let result = await gamble.coinFlip()
         if(interaction.options.get('guess').value === result) {
           embed.setColor('#2ECC71')
+          gamble.winLoss(interaction.user.id, 'win')
           let win = winMsg[Math.floor(Math.random() * winMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, interaction.options.get('bet').value)
           msg = 'Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + win + '\nNew balance: $' + newBalance
         }
         else {
           embed.setColor('#E74C3C')
+          gamble.winLoss(interaction.user.id, 'lose')
           let lose = loseMsg[Math.floor(Math.random() * loseMsg.length)]
           let newBalance = await gamble.updateBalance(interaction.user.id, 0 - interaction.options.get('bet').value)
           msg = 'Bet: $' + interaction.options.get('bet').value + '\nGuess: ' + interaction.options.get('guess').value + '\nResult: ' + result + '\n\n' + lose + '\nNew balance: $' + newBalance
@@ -620,21 +622,24 @@ client.on('interactionCreate',  async (interaction) => {
     }
     // check player balance
     else if(interaction.commandName === 'balance') {
-      let result
+      let balance
       let mentionedUser = interaction.options.get('user')
       let msg
+      let winrate
 
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
         .setColor('#3498DB')
 
       if(mentionedUser == null) {
-        result = await gamble.getBalance(interaction.user.id)
-        msg = 'You have $' + result
+        balance = await gamble.getBalance(interaction.user.id)
+        winrate = await gamble.winLoss(interaction.user.id)
+        msg = 'You have $' + balance + '\nWinrate: ' + winrate + '%'
       }
       else {
-        result = await gamble.getBalance(mentionedUser.user.id)
-        msg = mentionedUser.user.username + ' has $' + result
+        balance = await gamble.getBalance(mentionedUser.user.id)
+        winrate = await gamble.winLoss(mentionedUser.user.id)
+        msg = mentionedUser.user.username + ' has $' + balance + '\nWinrate: ' + winrate + '%'
       }
 
        embed.setDescription(msg)
@@ -712,7 +717,11 @@ function dailyMoney() {
   }
 }
 
-
+client.on('messageCreate', (message) => {
+  if (message.content === 'test') {
+    gamble.test()
+  }
+})
 
 client.login(process.env.TOKEN)
 

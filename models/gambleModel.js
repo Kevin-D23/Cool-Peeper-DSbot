@@ -9,6 +9,14 @@ const gambleSchema = new Schema({
     money: {
         type: Number,
         required: true
+    },
+    win: {
+        type: Number,
+        required: false
+    },
+    loss: {
+        type: Number,
+        required: false
     }
 });
 
