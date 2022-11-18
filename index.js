@@ -237,9 +237,10 @@ client.on('messageCreate', async (message) => {
         let channel
         if(channelName === 'gn') 
           channel = await client.channels.fetch(process.env.generalID)
-        else if(channelName === 'cp')
+        else if(channelName === 'ca')
           channel = await client.channels.fetch(process.env.coolPeepID)
-
+        else if(channelName === 'cp')
+          channel = await client.channels.fetch(process.env.coolPeeperID)
         channel.send(msg)
       }
     }
