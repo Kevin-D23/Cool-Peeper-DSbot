@@ -1,5 +1,5 @@
 require('dotenv/config')
-const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes, EmbedBuilder, Embed} = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, SelectMenuBuilder, InteractionCollector, Events, Routes, EmbedBuilder, Embed, Partials, PartialTextBasedChannel} = require('discord.js');
 const {REST} = require('@discordjs/rest')
 const birthday = require('./commands/birthday.js')
 const gamble = require('./commands/gamble.js')
@@ -17,8 +17,13 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildPresences
-  ] 
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.DirectMessages
+  ] ,
+  partials: [
+    Partials.Message,
+    Partials.Channel
+  ]
 });
 
 client.on('ready', () => {
@@ -219,11 +224,26 @@ client.on("interactionCreate", (interaction) => {
 })
 
 // ELLO
-client.on("messageCreate", (message) => {
+client.on('messageCreate', async (message) => {
   if(message.content.toLowerCase().includes("ello")) {
     if(message.author.id != client.user.id)
       message.channel.send("ELLO")
   }
+    // dm to general chat
+    else if(message.guildId == null && message.author.id !== client.user.id) {
+      if(message.author.id === process.env.bossmanID) {
+        const channelName = message.content[0].toLowerCase() + message.content[1].toLowerCase()
+        const msg = message.content.slice(3)
+        let channel
+        if(channelName === 'gn') 
+          channel = await client.channels.fetch(process.env.generalID)
+        else if(channelName === 'cp')
+          channel = await client.channels.fetch(process.env.coolPeepID)
+
+        channel.send(msg)
+      }
+    }
+    
 })
 
 // ADD BIRTHDAY
