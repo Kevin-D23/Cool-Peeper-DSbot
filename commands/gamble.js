@@ -109,7 +109,11 @@ async function winLoss (user, gameResult) {
         await Gamble.updateOne({username: user}, {$set: {loss: losses + 1}})
 
     winrate = Math.round((wins / (wins + losses)) * 100)
-    return winrate
+
+    if(wins == 0 && losses == 0)
+        return 0
+    else
+        return winrate
 }
 
 module.exports.hasFunds = hasFunds;
