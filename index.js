@@ -225,16 +225,19 @@ client.on("interactionCreate", (interaction) => {
 
 // ELLO
 client.on('messageCreate', async (message) => {
+  console.log('test')
   if(message.content.toLowerCase().includes("ello")) {
     if(message.author.id != client.user.id)
       message.channel.send("ELLO")
   }
     // dm to general chat
     else if(message.guildId == null && message.author.id !== client.user.id) {
+      console.log('test2')
       if(message.author.id === process.env.bossmanID) {
         const channelName = message.content[0].toLowerCase() + message.content[1].toLowerCase()
         const msg = message.content.slice(3)
         let channel
+        console.log('test1')
         if(channelName === 'gn') 
           channel = await client.channels.fetch(process.env.generalID)
         else if(channelName === 'ca')
