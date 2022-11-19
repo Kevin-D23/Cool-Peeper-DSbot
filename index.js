@@ -360,7 +360,7 @@ client.on('interactionCreate', async (interaction) => {
       else if(interaction.commandName === 'picktank') {
         let msg = gameSelect.pickHero('tank')
         let embed = new EmbedBuilder()
-        .setTitle('Birthday Bot')
+        .setTitle('Game Selector')
         .setDescription(msg)
         .setColor('#3498DB')
         await interaction.reply({
@@ -371,7 +371,7 @@ client.on('interactionCreate', async (interaction) => {
       else if(interaction.commandName === 'pickdps') {
         let msg = gameSelect.pickHero('dps')
         let embed = new EmbedBuilder()
-        .setTitle('Birthday Bot')
+        .setTitle('Game Selector')
         .setDescription(msg)
         .setColor('#3498DB')
         await interaction.reply({
@@ -382,7 +382,7 @@ client.on('interactionCreate', async (interaction) => {
       else if(interaction.commandName === 'picksupport') {
         let msg = gameSelect.pickHero('support')
         let embed = new EmbedBuilder()
-        .setTitle('Birthday Bot')
+        .setTitle('Game Selector')
         .setDescription(msg)
         .setColor('#3498DB')
         await interaction.reply({
