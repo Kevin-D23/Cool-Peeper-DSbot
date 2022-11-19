@@ -52,7 +52,9 @@ async function updateBalance(Username, amount) {
 async function addPlayer(Username) {
     const user = new Gamble({
         username: Username,
-        money: 1000
+        money: 1000,
+        win: 0,
+        loss: 0
     })
 
     user.save()
