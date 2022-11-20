@@ -637,7 +637,7 @@ client.on('interactionCreate',  async (interaction) => {
         balance = await gamble.getBalance(interaction.user.id)
         winrate = await gamble.winLoss(interaction.user.id)
         placement = await gamble.getPlacement(interaction.user.id)
-        msg = 'You have $' + balance + '\nWinrate: ' + winrate + '%\nPlacement: ' + placement 
+        msg = 'You have $' + balance + '\nWinrate: ' + winrate + '%\nPlacement: ' + placement  + '/' + numUsers
       }
       else {
         balance = await gamble.getBalance(mentionedUser.user.id)
