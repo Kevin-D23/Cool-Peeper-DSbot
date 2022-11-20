@@ -129,7 +129,7 @@ const commands = [
           name: 'bet',
           description: 'Bet amount',
           type: 4,
-          min_value: 0,
+          min_value: 1,
           required: true
         }, 
         {
@@ -176,7 +176,7 @@ const commands = [
           name: 'amount',
           description: 'Loan amount',
           type: 4,
-          min_value: 0,
+          min_value: 1,
           required: true
         }
       ]
