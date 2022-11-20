@@ -627,6 +627,7 @@ client.on('interactionCreate',  async (interaction) => {
       let msg
       let winrate
       let placement
+      let numUsers = interaction.guild.memberCount
 
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
@@ -642,7 +643,7 @@ client.on('interactionCreate',  async (interaction) => {
         balance = await gamble.getBalance(mentionedUser.user.id)
         winrate = await gamble.winLoss(mentionedUser.user.id)
         placement = await gamble.getPlacement(mentionedUser.user.id)
-        msg = mentionedUser.user.username + ' has $' + balance + '\nWinrate: ' + winrate + '%\nPlacement: ' + placement 
+        msg = mentionedUser.user.username + ' has $' + balance + '\nWinrate: ' + winrate + '%\nPlacement: ' + placement + '/' + numUsers
       }
 
        embed.setDescription(msg)
