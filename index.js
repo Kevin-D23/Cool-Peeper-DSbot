@@ -152,7 +152,7 @@ const commands = [
     },
     {
       name: 'balance',
-      description: 'Check how much money you have',
+      description: 'Check your player stats at the Peep Casinow',
       options: [
         {
           name: 'user',
@@ -187,8 +187,8 @@ const commands = [
     },
     {
       name: 'leaderboard',
-      description: 'Check the casino\'s top 5'
-    }
+      description: 'Check the casino\'s top and bottom 5'
+    },
   ]
 
 const rest = new REST({version: '10'}).setToken(process.env.TOKEN)
@@ -626,6 +626,7 @@ client.on('interactionCreate',  async (interaction) => {
       let mentionedUser = interaction.options.get('user')
       let msg
       let winrate
+      let placement
 
       let embed = new EmbedBuilder()
         .setTitle('Peep Casino')
@@ -634,12 +635,14 @@ client.on('interactionCreate',  async (interaction) => {
       if(mentionedUser == null) {
         balance = await gamble.getBalance(interaction.user.id)
         winrate = await gamble.winLoss(interaction.user.id)
-        msg = 'You have $' + balance + '\nWinrate: ' + winrate + '%'
+        placement = await gamble.getPlacement(interaction.user.id)
+        msg = 'You have $' + balance + '\nWinrate: ' + winrate + '%\nPlacement: ' + placement 
       }
       else {
         balance = await gamble.getBalance(mentionedUser.user.id)
         winrate = await gamble.winLoss(mentionedUser.user.id)
-        msg = mentionedUser.user.username + ' has $' + balance + '\nWinrate: ' + winrate + '%'
+        placement = await gamble.getPlacement(mentionedUser.user.id)
+        msg = mentionedUser.user.username + ' has $' + balance + '\nWinrate: ' + winrate + '%\nPlacement: ' + placement 
       }
 
        embed.setDescription(msg)
@@ -683,10 +686,13 @@ client.on('interactionCreate',  async (interaction) => {
         })
     }
 
-    // leaderboard
+    // top of leaderboard
     else if(interaction.commandName === 'leaderboard') {
-      let users = await gamble.leaderboardUsers()
-      let balances = await gamble.leaderboardMoney()
+      let usersTop = await gamble.leaderboardTopUsers()
+      let balancesTop = await gamble.leaderboardTopMoney()
+      let usersBot = await gamble.leaderboardBotUsers()
+      let balancesBot = await gamble.leaderboardBotMoney()
+      let numUsers = interaction.guild.memberCount - 9
       let msg = ""
       let currentUser
       let embed = new EmbedBuilder()
@@ -694,9 +700,16 @@ client.on('interactionCreate',  async (interaction) => {
         .setColor('#3498DB')
     
 
-      for(i = 0; i < users.length; i++){
-        currentUser = await interaction.guild.members.fetch(users[i])
-        msg += (i + 1) + '. ' + currentUser.user.username + '  -->  $' + balances[i] + '\n'
+      for(i = 0; i < usersTop.length; i++){
+        currentUser = await interaction.guild.members.fetch(usersTop[i])
+        msg += (i + 1) + '. ' + currentUser.user.username + '  -->  $' + balancesTop[i] + '\n'
+      }
+      
+      msg += '.\n.\n.\n'
+
+      for(i = usersBot.length - 1, j = numUsers; i >= 0; i--, j++){
+        currentUser = await interaction.guild.members.fetch(usersBot[i])
+        msg += j + '. ' + currentUser.user.username + '  -->  $' + balancesBot[i] + '\n'
       }
 
       embed.setDescription(msg)
@@ -717,11 +730,7 @@ function dailyMoney() {
   }
 }
 
-client.on('messageCreate', (message) => {
-  if (message.content === 'test') {
-    gamble.test()
-  }
-})
+
 
 client.login(process.env.TOKEN)
 

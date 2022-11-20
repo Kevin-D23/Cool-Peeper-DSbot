@@ -83,17 +83,33 @@ async function coinStats() {
     return 'Heads: ' + heads + ' ' + headsPerc + "%\nTails: " + tails + ' ' + tailsPerc + '%'
 }
 
-async function leaderboardUsers() {
-    let users = new Array(5)
-    let result = await Gamble.find().sort({money: -1})   
+async function leaderboardTopUsers() {
+    let users = new Array(10)
+    let result = await Gamble.find({__v: 0}).sort({money: -1})   
     for(i = 0; i < users.length; i++)
         users[i] = result[i].username
     return users
 }
 
-async function leaderboardMoney() {
-    let bal = new Array(5)
-    let result = await Gamble.find().sort({money: -1})   
+async function leaderboardTopMoney() {
+    let bal = new Array(10)
+    let result = await Gamble.find({__v: 0}).sort({money: -1})   
+    for(i = 0; i < bal.length; i++)
+        bal[i] = result[i].money
+    return bal
+}
+
+async function leaderboardBotUsers() {
+    let users = new Array(10)
+    let result = await Gamble.find({__v: 0}).sort({money: 1})   
+    for(i = 0; i < users.length; i++)
+        users[i] = result[i].username
+    return users
+}
+
+async function leaderboardBotMoney() {
+    let bal = new Array(10)
+    let result = await Gamble.find({__v: 0}).sort({money: 1})   
     for(i = 0; i < bal.length; i++)
         bal[i] = result[i].money
     return bal
@@ -118,6 +134,15 @@ async function winLoss (user, gameResult) {
         return winrate
 }
 
+async function getPlacement(user) {
+    let playerList = await Gamble.find({__v: 0}).sort({money: -1})
+    for (i = 0; i < playerList.length; i++) {
+        if(playerList[i].username == user)
+            return i + 1
+    }
+}
+
+
 module.exports.hasFunds = hasFunds;
 module.exports.getBalance = getBalance;
 module.exports.coinFlip = coinFlip
@@ -126,6 +151,9 @@ module.exports.addPlayer = addPlayer
 module.exports.removePlayer = removePlayer
 module.exports.dailyMoney = dailyMoney
 module.exports.coinStats = coinStats
-module.exports.leaderboardUsers = leaderboardUsers
-module.exports.leaderboardMoney = leaderboardMoney
+module.exports.leaderboardTopUsers = leaderboardTopUsers
+module.exports.leaderboardTopMoney = leaderboardTopMoney
+module.exports.leaderboardBotUsers = leaderboardBotUsers
+module.exports.leaderboardBotMoney = leaderboardBotMoney
 module.exports.winLoss = winLoss
+module.exports.getPlacement = getPlacement
