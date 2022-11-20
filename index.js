@@ -583,7 +583,7 @@ client.on('interactionCreate', async (interaction) => {
 client.on('interactionCreate',  async (interaction) => {
   if(interaction.isChatInputCommand()) {
     if(interaction.commandName === 'gamble') {
-      const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE']
+      const winMsg = ['AYYY GOOD SHIT', 'LETS GOOOOO', 'You win!', 'You got lucky this time', 'FUCK YEA', 'YIPPEEEE', 'YESSIRRR']
       const loseMsg = ['BHAAHAHAH YOU SUCK', 'Good luck next time loser', 'Save yo money next time', 'Why are you still playing', 'How tf you get that wrong', 'BROOOO UR ASS']
       let msg = ""
       let embed = new EmbedBuilder()
