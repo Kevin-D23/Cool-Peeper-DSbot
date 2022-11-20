@@ -404,6 +404,8 @@ client.on('interactionCreate', async (interaction) => {
 // remove player from gamble database when they leave
 client.on('guildMemberRemove', (member) => {
   gamble.removePlayer(member.user.id)
+  var channel = member.guild.channels.cache.get(process.env.welcomeID);
+  channel.send(`Goodbye, <@${member.user.id}>`)
 })
 
 
