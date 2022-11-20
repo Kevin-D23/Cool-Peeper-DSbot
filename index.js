@@ -189,6 +189,10 @@ const commands = [
       name: 'leaderboard',
       description: 'Check the casino\'s top and bottom 5'
     },
+    {
+      name: 'collectdaily',
+      description: 'Collect your daily $200'
+    }
   ]
 
 const rest = new REST({version: '10'}).setToken(process.env.TOKEN)
@@ -689,7 +693,7 @@ client.on('interactionCreate',  async (interaction) => {
         })
     }
 
-    // top of leaderboard
+    // top and bottom leaderboard
     else if(interaction.commandName === 'leaderboard') {
       let usersTop = await gamble.leaderboardTopUsers()
       let balancesTop = await gamble.leaderboardTopMoney()
@@ -722,6 +726,28 @@ client.on('interactionCreate',  async (interaction) => {
         })
 
     }
+
+    else if(interaction.commandName === 'collectdaily') {
+      let result = await gamble.collectDaily(interaction.user.id)
+      let msg = ''
+      let embed = new EmbedBuilder()
+        .setTitle('Peep Casino')
+        .setColor('#3498DB')
+        
+      if(result) {
+        msg = 'Daily collected'
+      }
+      else {
+        msg = 'Daily has already been collected'
+        embed.setColor('#E74C3C')
+      }
+
+      embed.setDescription(msg)
+
+      await interaction.reply({
+        embeds : [embed]
+      })
+    }
   }
 })
 
@@ -729,10 +755,9 @@ client.on('interactionCreate',  async (interaction) => {
 function dailyMoney() {
   var date = new Date()
   if(date.getHours() === 0 && date.getMinutes() === 0) {
-    gamble.dailyMoney()
+    gamble.resetDaily()
   }
 }
-
 
 
 client.login(process.env.TOKEN)

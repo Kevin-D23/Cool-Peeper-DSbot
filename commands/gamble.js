@@ -64,14 +64,18 @@ async function removePlayer(Username) {
     await Gamble.deleteOne({username: Username})
 }
 
-async function dailyMoney() {
-    let cursor = await Gamble.collection.find()
-    .forEach((doc) => {
-        if(doc) {
-            if(doc._id.valueOf() !== '6373df608946ca2d379f4aa9')
-                updateBalance(doc.username, 200)
-        }
-    })
+async function collectDaily(user) {
+    let doc = await Gamble.findOne({username: user})
+    let collected = doc.dailyCollected
+    let dailyAmount = 200
+
+    if(!collected){
+        await Gamble.updateOne({username: user}, {$set: {dailyCollected: true}})
+        updateBalance(user, dailyAmount)
+        return true
+    }
+    else
+        return false
 }
 
 async function coinStats() {
@@ -142,6 +146,12 @@ async function getPlacement(user) {
     }
 }
 
+async function resetDaily() {
+    Gamble.collection.find().forEach(async(doc) => {
+         await Gamble.updateOne({username: doc.username}, {$set: {dailyCollected: false}})
+    }) 
+}
+
 
 module.exports.hasFunds = hasFunds;
 module.exports.getBalance = getBalance;
@@ -149,7 +159,7 @@ module.exports.coinFlip = coinFlip
 module.exports.updateBalance = updateBalance
 module.exports.addPlayer = addPlayer
 module.exports.removePlayer = removePlayer
-module.exports.dailyMoney = dailyMoney
+module.exports.collectDaily = collectDaily
 module.exports.coinStats = coinStats
 module.exports.leaderboardTopUsers = leaderboardTopUsers
 module.exports.leaderboardTopMoney = leaderboardTopMoney
@@ -157,3 +167,4 @@ module.exports.leaderboardBotUsers = leaderboardBotUsers
 module.exports.leaderboardBotMoney = leaderboardBotMoney
 module.exports.winLoss = winLoss
 module.exports.getPlacement = getPlacement
+module.exports.resetDaily = resetDaily

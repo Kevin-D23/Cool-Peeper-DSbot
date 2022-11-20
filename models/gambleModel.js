@@ -17,6 +17,10 @@ const gambleSchema = new Schema({
     loss: {
         type: Number,
         required: false
+    },
+    dailyCollected: {
+        type: Boolean,
+        required: false
     }
 });
 
