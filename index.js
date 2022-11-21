@@ -697,8 +697,9 @@ client.on('interactionCreate',  async (interaction) => {
     else if(interaction.commandName === 'leaderboard') {
       let usersTop = await gamble.leaderboardTopUsers()
       let balancesTop = await gamble.leaderboardTopMoney()
-      let shameWall = await gamble.getShameWall()
-      let numUsers = interaction.guild.memberCount - 9
+      let usersBot = await gamble.leaderboardBotUsers()
+      let balancesBot = await gamble.leaderboardBotMoney()
+      let numUsers = interaction.guild.memberCount
       let msg = ""
       let currentUser
       let embed = new EmbedBuilder()
@@ -711,11 +712,11 @@ client.on('interactionCreate',  async (interaction) => {
         msg += (i + 1) + '. ' + currentUser.user.username + '  -->  $' + balancesTop[i] + '\n'
       }
       
-      msg += '.\n.\n.\nWall of Shame:\n'
+      msg += '.\n.\nWall of Shame:\n'
       
-      for(i = 0; i < shameWall.length; i++){
-        currentUser = await interaction.guild.members.fetch(shameWall[i])
-        msg += currentUser.user.username + '  -->  $0\n'
+      for(i = usersBot.length - 1,j = numUsers - 4; i >= 0; i--, j++){
+        currentUser = await interaction.guild.members.fetch(usersBot[i])
+        msg += j + '. ' + currentUser.user.username + '  -->  $' + balancesBot[i] + '\n'
       }
 
      

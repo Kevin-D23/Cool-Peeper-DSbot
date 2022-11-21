@@ -103,12 +103,20 @@ async function leaderboardTopMoney() {
     return bal
 }
 
-async function getShameWall(){
-    let arr = await Gamble.find({money: 0})
-    let result = new Array(arr.length)
-    for(i = 0; i < result.length; i++) 
-        result[i] = arr[i].username
-    return result
+async function leaderboardBotUsers() {
+    let users = new Array(5)
+    let result = await Gamble.find({__v: 0}).sort({money: 1})   
+    for(i = 0; i < users.length; i++)
+        users[i] = result[i].username
+    return users
+}
+
+async function leaderboardBotMoney() {
+    let bal = new Array(5)
+    let result = await Gamble.find({__v: 0}).sort({money: 1})   
+    for(i = 0; i < bal.length; i++)
+        bal[i] = result[i].money
+    return bal
 }
 
 async function winLoss (user, gameResult) {
@@ -159,4 +167,5 @@ module.exports.leaderboardTopMoney = leaderboardTopMoney
 module.exports.winLoss = winLoss
 module.exports.getPlacement = getPlacement
 module.exports.resetDaily = resetDaily
-module.exports.getShameWall = getShameWall
+module.exports.leaderboardBotMoney = leaderboardBotMoney
+module.exports.leaderboardBotUsers = leaderboardBotUsers
