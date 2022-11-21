@@ -88,7 +88,7 @@ async function coinStats() {
 }
 
 async function leaderboardTopUsers() {
-    let users = new Array(10)
+    let users = new Array(5)
     let result = await Gamble.find({__v: 0}).sort({money: -1})   
     for(i = 0; i < users.length; i++)
         users[i] = result[i].username
@@ -96,27 +96,19 @@ async function leaderboardTopUsers() {
 }
 
 async function leaderboardTopMoney() {
-    let bal = new Array(10)
+    let bal = new Array(5)
     let result = await Gamble.find({__v: 0}).sort({money: -1})   
     for(i = 0; i < bal.length; i++)
         bal[i] = result[i].money
     return bal
 }
 
-async function leaderboardBotUsers() {
-    let users = new Array(10)
-    let result = await Gamble.find({__v: 0}).sort({money: 1})   
-    for(i = 0; i < users.length; i++)
-        users[i] = result[i].username
-    return users
-}
-
-async function leaderboardBotMoney() {
-    let bal = new Array(10)
-    let result = await Gamble.find({__v: 0}).sort({money: 1})   
-    for(i = 0; i < bal.length; i++)
-        bal[i] = result[i].money
-    return bal
+async function getShameWall(){
+    let arr = await Gamble.find({money: 0})
+    let result = new Array(arr.length)
+    for(i = 0; i < result.length; i++) 
+        result[i] = arr[i].username
+    return result
 }
 
 async function winLoss (user, gameResult) {
@@ -153,6 +145,7 @@ async function resetDaily() {
 }
 
 
+
 module.exports.hasFunds = hasFunds;
 module.exports.getBalance = getBalance;
 module.exports.coinFlip = coinFlip
@@ -163,8 +156,7 @@ module.exports.collectDaily = collectDaily
 module.exports.coinStats = coinStats
 module.exports.leaderboardTopUsers = leaderboardTopUsers
 module.exports.leaderboardTopMoney = leaderboardTopMoney
-module.exports.leaderboardBotUsers = leaderboardBotUsers
-module.exports.leaderboardBotMoney = leaderboardBotMoney
 module.exports.winLoss = winLoss
 module.exports.getPlacement = getPlacement
 module.exports.resetDaily = resetDaily
+module.exports.getShameWall = getShameWall
