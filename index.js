@@ -409,7 +409,7 @@ client.on('interactionCreate', async (interaction) => {
 client.on('guildMemberRemove', (member) => {
   gamble.removePlayer(member.user.id)
   var channel = member.guild.channels.cache.get(process.env.welcomeID);
-  channel.send(`Goodbye, <@${member.user.id}>`)
+  //channel.send(`Goodbye, <@${member.user.id}>`)
 })
 
 
