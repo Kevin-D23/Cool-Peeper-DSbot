@@ -4,6 +4,7 @@ const {REST} = require('@discordjs/rest')
 const birthday = require('./commands/birthday.js')
 const gamble = require('./commands/gamble.js')
 const gameSelect = require('./commands/pickGame.js')
+const food = require('./commands/foodFinder.js')
 const BirthdayObj = require('./models/birthdayModel')
 const GambleObj = require('./models/gambleModel')
 const mongoose = require('mongoose')
@@ -34,6 +35,7 @@ client.on('ready', () => {
   setInterval(genQuote, 60000)
   setInterval(checkBirthday, 60000);
   setInterval(dailyMoney, 60000)
+  food.findFood("sacramento", 2, "sushi", 10)
 });
 
 var qotd = ''
