@@ -8,36 +8,54 @@ const options = {
   },
 };
 
-function findFood(location, price, catergory, distance) {
+async function findFood(location, price, catergory, numResults) {
   var locationURL = "location=" + location;
   var priceURL = ""
   var categoryURL = "&term=" + catergory;
-  var distanceURL = ""
+  var numResultsURL = "&limit=" + numResults
+  var resultMsg = ""
 
   if (price != 0)
     priceURL = "&price=" + price;
-
-  if (distance != 0) 
-    distanceURL = "&radius=" + toMiles(distance)
 
   fetchURL =
     "https://api.yelp.com/v3/businesses/search?" +
     locationURL +
     categoryURL +
-    distanceURL +
     priceURL +
-    "&sort_by=best_match&limit=10";
-    console.log(fetchURL)
-  fetch(fetchURL, options)
+    "&sort_by=best_match" +
+    numResultsURL;
+
+
+  return await fetch(fetchURL, options)
     .then((response) => response.json())
     .then((response) => {
-        
+      if(response.error)
+        return response.error.description
+
+        response.businesses.map((restaurant) => {
+          var numStars = ""
+          resultMsg += restaurant.name + " " + restaurant.price + " "
+          for(var i = 0; i < Math.floor(restaurant.rating); i++)
+             numStars += "★"
+          while(numStars.length != 5)
+            numStars += "☆"
+
+          resultMsg += numStars + "\n"
+          restaurant.location.display_address.forEach((address) => resultMsg += address + " ")
+          resultMsg += "\n[Link](" + restaurant.url + ")\n\n" 
+        })
+
+        resultMsg += "Random choice: "
+
+        let randNum = Math.floor(Math.random() * response.businesses.length)
+
+        resultMsg += response.businesses[randNum].name
+        return resultMsg
     })
-    .catch((err) => console.error(err));
+    .catch((err) => console.log(err))
+
 }
 
-function toMiles(distanceMeters){
-    return distanceMeters * 1609;
-}
 
 module.exports.findFood = findFood;
