@@ -10,22 +10,34 @@ const options = {
 
 function findFood(location, price, catergory, distance) {
   var locationURL = "location=" + location;
-  var priceURL = "&price=" + price;
+  var priceURL = ""
   var categoryURL = "&term=" + catergory;
-  var distanceURL = "&radius=" + distance;
+  var distanceURL = ""
+
+  if (price != 0)
+    priceURL = "&price=" + price;
+
+  if (distance != 0) 
+    distanceURL = "&radius=" + toMiles(distance)
 
   fetchURL =
     "https://api.yelp.com/v3/businesses/search?" +
-    location +
+    locationURL +
     categoryURL +
     distanceURL +
     priceURL +
-    "sort_by=best_match&limit=10";
+    "&sort_by=best_match&limit=10";
     console.log(fetchURL)
   fetch(fetchURL, options)
     .then((response) => response.json())
-    .then((response) => console.log(response))
+    .then((response) => {
+        
+    })
     .catch((err) => console.error(err));
+}
+
+function toMiles(distanceMeters){
+    return distanceMeters * 1609;
 }
 
 module.exports.findFood = findFood;

@@ -35,7 +35,7 @@ client.on('ready', () => {
   setInterval(genQuote, 60000)
   setInterval(checkBirthday, 60000);
   setInterval(dailyMoney, 60000)
-  food.findFood("sacramento", 2, "sushi", 10)
+  food.findFood("sacramento", 0, "taco", 0)
 });
 
 var qotd = ''
