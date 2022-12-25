@@ -47,6 +47,7 @@ client.on("ready", () => {
   setInterval(genQuote, 60000);
   setInterval(checkBirthday, 60000);
   setInterval(dailyMoney, 60000);
+  flipOffPlayer();
 });
 
 var qotd = "";
@@ -918,5 +919,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
     });
   }
 });
+
+async function flipOffPlayer() {
+  var date = new Date();
+  if (date.getHours() === 0 && date.getMinutes() === 0) {
+    const channel = await client.guilds.resolve("461598039073751050");
+    channel.members.fetch().then(async (members) => {
+      const randNum = Math.floor(Math.random() * channel.memberCount);
+      let user = members.at(randNum).id;
+      const generalChannel = await client.channels.fetch(process.env.generalID);
+      generalChannel.send({ content: `🖕fuck you <@${user}>🖕` });
+    });
+  }
+}
 
 client.login(process.env.TOKEN);
