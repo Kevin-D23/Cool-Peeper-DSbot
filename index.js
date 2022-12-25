@@ -47,7 +47,7 @@ client.on("ready", () => {
   setInterval(genQuote, 60000);
   setInterval(checkBirthday, 60000);
   setInterval(dailyMoney, 60000);
-  flipOffPlayer();
+  setInterval(flipOffPlayer, 60000);
 });
 
 var qotd = "";
