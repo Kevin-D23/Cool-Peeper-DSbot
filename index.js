@@ -1039,12 +1039,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     let search = interaction.options.get("song").value;
 
-    if (search.includes("spotify.com")){
-      embed.setDescription("**Youtube links only**");
-      embed.setColor(embedColors.errorColor);
-      return await interaction.reply({ embeds: [embed] });
-    }
-
     const result = await client.player.search(search, {
       requestedBy: interaction.user,
       searchEngine: QueryType.AUTO,
