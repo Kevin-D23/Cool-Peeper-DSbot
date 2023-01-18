@@ -45,6 +45,11 @@ const client = new Client({
   }
 })
 
+client.player.on("trackStart", (queue, track) => {
+  let embed = new EmbedBuilder().setColor(embedColors.mainColor).setDescription(`🎶 | Now playing **${track.title}**!`).setThumbnail(track.thumbnail)
+  queue.metadata.channel.send({embeds: [embed]})
+  })
+
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -1003,7 +1008,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return await interaction.reply({ embeds: [embed] });
     }
 
-      const queue = await client.player.createQueue(interaction.guild);
+      const queue = await client.player.createQueue(interaction.guild, {
+        metadata: {
+            channel: interaction.channel
+        }
+    });
       if (!queue.connection)
         await queue.connect(interaction.member.voice.channel);
 
