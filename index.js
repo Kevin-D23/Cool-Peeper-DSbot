@@ -38,18 +38,25 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel],
 });
 
- client.player = new Player(client, {
+client.player = new Player(client, {
   ytdlOptions: {
     quality: "highestaudio",
-    highWaterMark: 1 << 25
-  }
-})
+    highWaterMark: 1 << 25,
+  },
+});
 
 client.player.on("trackStart", (queue, track) => {
-  let embed = new EmbedBuilder().setColor(embedColors.mainColor).setDescription(`🎶 | Now playing **${track.title}**!`).setThumbnail(track.thumbnail)
-  queue.metadata.channel.send({embeds: [embed]})
-  })
-
+  let embed = new EmbedBuilder()
+    .setColor(embedColors.mainColor)
+    .setDescription(`🎶 | Now playing **[${track.title}](${track.url})**!`)
+    .setThumbnail(track.thumbnail)
+    .setFooter({
+      text: `Added by ${track.requestedBy.username}`,
+      iconURL: `${track.requestedBy.avatarURL()}`,
+    })
+    .setTitle("**Now Playing**");
+  queue.metadata.channel.send({ embeds: [embed] });
+});
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -324,6 +331,18 @@ const commands = [
   {
     name: "skip",
     description: "Skip current song",
+  },
+  {
+    name: "remove",
+    description: "Remove a song from the queue",
+    options: [
+      {
+        name: "number",
+        description: "Queue number",
+        type: 10,
+        required: true
+      },
+    ],
   },
 ];
 
@@ -1003,40 +1022,43 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.commandName === "play") {
     let embed = new EmbedBuilder().setColor(embedColors.mainColor);
     if (!interaction.member.voice.channel) {
-      embed.setDescription("You need to be in a voice channel to play a song.");
+      embed.setDescription(
+        "**You need to be in a voice channel to play a song**"
+      );
       embed.setColor(embedColors.errorColor);
       return await interaction.reply({ embeds: [embed] });
     }
 
-      const queue = await client.player.createQueue(interaction.guild, {
-        metadata: {
-            channel: interaction.channel
-        }
+    const queue = await client.player.createQueue(interaction.guild, {
+      metadata: {
+        channel: interaction.channel,
+      },
     });
-      if (!queue.connection)
-        await queue.connect(interaction.member.voice.channel);
+    if (!queue.connection)
+      await queue.connect(interaction.member.voice.channel);
 
-      let search = interaction.options.get("song").value;
+    let search = interaction.options.get("song").value;
 
-        const result = await client.player.search(search, {
-          requestedBy: interaction.user,
-          searchEngine: QueryType.AUTO,
-        });
-        if (result.tracks.length === 0) {
-          embed.setDescription("No results");
-          embed.setColor(embedColors.errorColor);
-          return await interaction.reply({ embeds: [embed] });
-        }
-        const song = result.tracks[0];
-        queue.addTrack(song)
-        embed
-          .setDescription(
-            `**[${song.title}](${song.url})** has been added to the queue.`
-          )
-          .setThumbnail(song.thumbnail)
-          .setFooter({ text: `Duration: ${song.duration}` });
+    const result = await client.player.search(search, {
+      requestedBy: interaction.user,
+      searchEngine: QueryType.AUTO,
+    });
+    if (result.tracks.length === 0) {
+      embed.setDescription("**No results**");
+      embed.setColor(embedColors.errorColor);
+      return await interaction.reply({ embeds: [embed] });
+    }
+    const song = result.tracks[0];
+    queue.addTrack(song);
+    embed
+      .setDescription(`**[${song.title}](${song.url})**`)
+      .setThumbnail(song.thumbnail)
+      .setFooter({
+        text: `Added by ${interaction.user.username}`,
+        iconURL: interaction.user.avatarURL(),
+      });
 
-      if (!queue.playing) await queue.play();
+    if (!queue.playing) await queue.play();
 
     await interaction.reply({ embeds: [embed] });
   } else if (interaction.commandName === "queue") {
@@ -1044,7 +1066,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const queue = await client.player.getQueue(interaction.guildId);
     if (!queue || !queue.playing) {
-      embed.setDescription("There are no songs in the queue.");
+      embed.setDescription(`**There are no songs in the queue**`);
       return await interaction.reply({ embeds: [embed] });
     }
 
@@ -1053,7 +1075,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (page > totalPages) {
       embed
-        .setDescription("Invalid page. There are only ${totalPages} pages.")
+        .setDescription(`**Invalid page. There are only ${totalPages} pages**`)
         .setColor(embedColors.errorColor);
       return await interaction.reply({ embeds: [embed] });
     }
@@ -1090,12 +1112,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const queue = await client.player.getQueue(interaction.guildId);
 
     if (!queue) {
-      embed.setDescription("There are no songs in the queue.");
+      embed.setDescription("**There are no songs in the queue**");
       return await interaction.reply({ embeds: [embed] });
     }
 
     queue.destroy();
-    embed.setDescription("Music stopped.");
+    embed.setDescription("**Music stopped**");
 
     await interaction.reply({ embeds: [embed] });
   } else if (interaction.commandName === "shuffle") {
@@ -1103,13 +1125,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const queue = await client.player.getQueue(interaction.guildId);
 
     if (!queue) {
-      embed.setDescription("There are no songs in the queue");
+      embed.setDescription("**There are no songs in the queue**");
       return await interaction.reply({ embeds: [embed] });
     }
 
     queue.shuffle();
     embed.setDescription(
-      `Queue of ${queue.tracks.length} songs has been shuffled`
+      `**Queue of ${queue.tracks.length} songs has been shuffled**`
     );
     await interaction.reply({ embeds: [embed] });
   } else if (interaction.commandName === "pause") {
@@ -1119,13 +1141,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (!queue) {
       embed
         .setColor(embedColors.errorColor)
-        .setDescription("There are no songs in the queue.");
+        .setDescription("**There are no songs in the queue**");
       return await interaction.reply({ embeds: [embed] });
     }
 
     queue.setPaused(true);
     embed.setDescription(
-      "Music has been paused. Use '/resume' to resume the music."
+      "**Music has been paused.** Use '/resume' to resume the music."
     );
     await interaction.reply({ embeds: [embed] });
   } else if (interaction.commandName === "resume") {
@@ -1135,12 +1157,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (!queue) {
       embed
         .setColor(embedColors.errorColor)
-        .setDescription("There are no songs in the queue.");
+        .setDescription("**There are no songs in the queue**");
       return await interaction.reply({ embeds: [embed] });
     }
 
     queue.setPaused(false);
-    embed.setDescription("Music has been resumed");
+    embed.setDescription("**Music resumed**");
     await interaction.reply({ embeds: [embed] });
   } else if (interaction.commandName === "skip") {
     let embed = new EmbedBuilder().setColor(embedColors.mainColor);
@@ -1155,12 +1177,36 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const currentSong = queue.current;
 
-    queue.skip()
+    queue.skip();
     embed
-      .setDescription(`${currentSong.title} has been skipped!`)
-      .setThumbnail(currentSong.thumbnail);
+      .setDescription(
+        `**[${currentSong.title}](${currentSong.url}) has been skipped!**`
+      )
+      .setThumbnail(currentSong.thumbnail)
+      .setFooter({
+        text: `Added by ${currentSong.requestedBy.username}`,
+        iconURL: `${currentSong.requestedBy.avatarURL()}`,
+      });
 
     await interaction.reply({ embeds: [embed] });
+  } else if (interaction.commandName === "remove") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor)
+    const queue = client.player.getQueue(interaction.guildId)
+
+    if (!queue) {
+      embed
+        .setDescription("There are no songs in the queue.")
+        .setColor(embedColors.errorColor);
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    const pickedSong = queue.tracks[interaction.options.get("number").value - 1]
+
+    embed.setDescription(`[${pickedSong.title}](${pickedSong.url}) removed from queue`).setThumbnail(pickedSong.thumbnail)
+
+    await interaction.reply({embeds: [embed]})
+
+    queue.remove(interaction.options.get("number").value - 1)
   }
 });
 
