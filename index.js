@@ -23,6 +23,7 @@ const GambleObj = require("./models/gambleModel");
 const mongoose = require("mongoose");
 const qotdURL = "https://zenquotes.io/api/today/";
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather?zip=";
+const { Player, QueryType } = require("discord-player");
 
 const client = new Client({
   intents: [
@@ -32,9 +33,18 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.GuildVoiceStates,
   ],
   partials: [Partials.Message, Partials.Channel],
 });
+
+ client.player = new Player(client, {
+  ytdlOptions: {
+    quality: "highestaudio",
+    highWaterMark: 1 << 25
+  }
+})
+
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -51,6 +61,11 @@ client.on("ready", () => {
 });
 
 var qotd = "";
+
+const embedColors = {
+  mainColor: "#3498DB",
+  errorColor: "#E74C3C",
+};
 
 const commands = [
   {
@@ -261,6 +276,50 @@ const commands = [
       },
     ],
   },
+  {
+    name: "play",
+    description: "Play a song",
+    options: [
+      {
+        name: "song",
+        description: "Enter youtube link or keywords to search for a song",
+        type: 3,
+        required: true,
+      },
+    ],
+  },
+  {
+    name: "queue",
+    description: "Check the song queue",
+    options: [
+      {
+        name: "page",
+        description: "Enter queue page number",
+        type: 10,
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "stop",
+    description: "Stop playing songs",
+  },
+  {
+    name: "shuffle",
+    description: "Shuffle song queue",
+  },
+  {
+    name: "pause",
+    description: "Pause music",
+  },
+  {
+    name: "resume",
+    description: "Resume playing music",
+  },
+  {
+    name: "skip",
+    description: "Skip current song",
+  },
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
@@ -334,7 +393,7 @@ client.on("interactionCreate", async (interaction) => {
       const result = await birthday.doesExist(interaction.user.id);
       let embed = new EmbedBuilder()
         .setTitle("Birthday Bot")
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       if (result != null) {
         embed.setDescription("Birthday is already in database");
@@ -384,7 +443,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Birthday Bot")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -396,7 +455,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Birthday Bot")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -433,7 +492,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Game Selector")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -444,7 +503,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Game Selector")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -455,7 +514,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Game Selector")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -466,7 +525,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Game Selector")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -574,7 +633,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Command List")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       await interaction.reply({
         embeds: [embed],
@@ -604,7 +663,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Quote Of The Day")
         .setDescription(qotd)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       await interaction.reply({
         embeds: [embed],
@@ -647,7 +706,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Weather: " + interaction.options.get("zip").value)
         .setDescription(weather)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
       await interaction.reply({
         embeds: [embed],
       });
@@ -705,7 +764,7 @@ client.on("interactionCreate", async (interaction) => {
             "\nNew balance: $" +
             newBalance;
         } else {
-          embed.setColor("#E74C3C");
+          embed.setColor(embedColors.errorColor);
           gamble.winLoss(interaction.user.id, "lose");
           let lose = loseMsg[Math.floor(Math.random() * loseMsg.length)];
           let newBalance = await gamble.updateBalance(
@@ -738,7 +797,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Peep Casino")
         .setDescription(result)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       await interaction.reply({
         embeds: [embed],
@@ -755,7 +814,7 @@ client.on("interactionCreate", async (interaction) => {
 
       let embed = new EmbedBuilder()
         .setTitle("Peep Casino")
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       if (mentionedUser == null) {
         balance = await gamble.getBalance(interaction.user.id);
@@ -811,7 +870,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Peep Casino")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       await interaction.reply({
         embeds: [embed],
@@ -824,7 +883,7 @@ client.on("interactionCreate", async (interaction) => {
       let embed = new EmbedBuilder()
         .setTitle("Peep Casino")
         .setDescription(msg)
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       await interaction.reply({
         embeds: [embed],
@@ -842,7 +901,7 @@ client.on("interactionCreate", async (interaction) => {
       let currentUser;
       let embed = new EmbedBuilder()
         .setTitle("Peep Casino")
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       for (i = 0; i < usersTop.length; i++) {
         currentUser = await interaction.guild.members.fetch(usersTop[i]);
@@ -879,13 +938,13 @@ client.on("interactionCreate", async (interaction) => {
       let msg = "";
       let embed = new EmbedBuilder()
         .setTitle("Peep Casino")
-        .setColor("#3498DB");
+        .setColor(embedColors.mainColor);
 
       if (result) {
         msg = "Daily collected";
       } else {
         msg = "Daily has already been collected";
-        embed.setColor("#E74C3C");
+        embed.setColor(embedColors.errorColor);
       }
 
       embed.setDescription(msg);
@@ -911,7 +970,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     let category = interaction.options.get("category").value;
     let results = interaction.options.get("results").value;
     let msg = await food.findFood(location, price, category, results);
-    let embed = new EmbedBuilder().setTitle("Peep Casino").setColor("#3498DB");
+    let embed = new EmbedBuilder()
+      .setTitle("Peep Casino")
+      .setColor(embedColors.mainColor);
 
     embed.setDescription(msg);
     await interaction.reply({
@@ -932,5 +993,166 @@ async function flipOffPlayer() {
     });
   }
 }
+
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction.commandName === "play") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+    if (!interaction.member.voice.channel) {
+      embed.setDescription("You need to be in a voice channel to play a song.");
+      embed.setColor(embedColors.errorColor);
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+      const queue = await client.player.createQueue(interaction.guild);
+      if (!queue.connection)
+        await queue.connect(interaction.member.voice.channel);
+
+      let search = interaction.options.get("song").value;
+
+        const result = await client.player.search(search, {
+          requestedBy: interaction.user,
+          searchEngine: QueryType.AUTO,
+        });
+        if (result.tracks.length === 0) {
+          embed.setDescription("No results");
+          embed.setColor(embedColors.errorColor);
+          return await interaction.reply({ embeds: [embed] });
+        }
+        const song = result.tracks[0];
+        queue.addTrack(song)
+        embed
+          .setDescription(
+            `**[${song.title}](${song.url})** has been added to the queue.`
+          )
+          .setThumbnail(song.thumbnail)
+          .setFooter({ text: `Duration: ${song.duration}` });
+
+      if (!queue.playing) await queue.play();
+
+    await interaction.reply({ embeds: [embed] });
+  } else if (interaction.commandName === "queue") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+
+    const queue = await client.player.getQueue(interaction.guildId);
+    if (!queue || !queue.playing) {
+      embed.setDescription("There are no songs in the queue.");
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    const totalPages = Math.ceil(queue.tracks.length / 10) || 1;
+    const page = (interaction.options.getNumber("page") || 1) - 1;
+
+    if (page > totalPages) {
+      embed
+        .setDescription("Invalid page. There are only ${totalPages} pages.")
+        .setColor(embedColors.errorColor);
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    const queueString = queue.tracks
+      .slice(page * 10, page * 10 + 10)
+      .map((song, i) => {
+        return `**${page * 10 + i + 1}.** \`[${song.duration}}\` ${
+          song.title
+        } -- <@${song.requestedBy.id}>`;
+      })
+      .join("\n");
+
+    const currentSong = queue.current;
+
+    embed
+      .setDescription(
+        `**Currently Playing**\n` +
+          (currentSong
+            ? `\`[${currentSong.duration}]\` ${currentSong.title} -- <@${currentSong.requestedBy.id}>`
+            : "None") +
+          `\n\n**Queue**\n${queueString}`
+      )
+      .setFooter({
+        text: `Page ${page + 1} out of ${totalPages}`,
+      })
+      .setThumbnail(currentSong.thumbnail);
+
+    await interaction.reply({
+      embeds: [embed],
+    });
+  } else if (interaction.commandName == "stop") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+    const queue = await client.player.getQueue(interaction.guildId);
+
+    if (!queue) {
+      embed.setDescription("There are no songs in the queue.");
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    queue.destroy();
+    embed.setDescription("Music stopped.");
+
+    await interaction.reply({ embeds: [embed] });
+  } else if (interaction.commandName === "shuffle") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+    const queue = await client.player.getQueue(interaction.guildId);
+
+    if (!queue) {
+      embed.setDescription("There are no songs in the queue");
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    queue.shuffle();
+    embed.setDescription(
+      `Queue of ${queue.tracks.length} songs has been shuffled`
+    );
+    await interaction.reply({ embeds: [embed] });
+  } else if (interaction.commandName === "pause") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+    const queue = await client.player.getQueue(interaction.guildId);
+
+    if (!queue) {
+      embed
+        .setColor(embedColors.errorColor)
+        .setDescription("There are no songs in the queue.");
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    queue.setPaused(true);
+    embed.setDescription(
+      "Music has been paused. Use '/resume' to resume the music."
+    );
+    await interaction.reply({ embeds: [embed] });
+  } else if (interaction.commandName === "resume") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+    const queue = await client.player.getQueue(interaction.guildId);
+
+    if (!queue) {
+      embed
+        .setColor(embedColors.errorColor)
+        .setDescription("There are no songs in the queue.");
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    queue.setPaused(false);
+    embed.setDescription("Music has been resumed");
+    await interaction.reply({ embeds: [embed] });
+  } else if (interaction.commandName === "skip") {
+    let embed = new EmbedBuilder().setColor(embedColors.mainColor);
+    const queue = client.player.getQueue(interaction.guildId);
+
+    if (!queue) {
+      embed
+        .setDescription("There are no songs in the queue.")
+        .setColor(embedColors.errorColor);
+      return await interaction.reply({ embeds: [embed] });
+    }
+
+    const currentSong = queue.current;
+
+    queue.skip()
+    embed
+      .setDescription(`${currentSong.title} has been skipped!`)
+      .setThumbnail(currentSong.thumbnail);
+
+    await interaction.reply({ embeds: [embed] });
+  }
+});
 
 client.login(process.env.TOKEN);
