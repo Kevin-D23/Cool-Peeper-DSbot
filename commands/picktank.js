@@ -4,18 +4,10 @@ const gameSelect = require("../commandFunctions/pickGameFunctions");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("pickgame")
-    .setDescription("Pick a random game to play"),
+    .setName("picktank")
+    .setDescription("Pick a random overwatch tank to play"),
   async execute(interaction) {
-    let games = [
-      "Apex",
-      "Valorant",
-      "Overwatch",
-      "Plateup",
-      "Roblox",
-      "League",
-    ];
-    let msg = gameSelect.pickGame(games);
+    let msg = gameSelect.pickHero("tank");
     let embed = new EmbedBuilder()
       .setTitle("Game Selector")
       .setDescription(msg)

@@ -1,23 +1,15 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const embedColors = require("../commandFunctions/embedColors");
-const gameSelect = require("../commandFunctions/pickGameFunctions");
+const birthday = require("../commandFunctions/birthday");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("pickgame")
-    .setDescription("Pick a random game to play"),
+    .setName("removebirthday")
+    .setDescription("Remove your birthday from the database"),
   async execute(interaction) {
-    let games = [
-      "Apex",
-      "Valorant",
-      "Overwatch",
-      "Plateup",
-      "Roblox",
-      "League",
-    ];
-    let msg = gameSelect.pickGame(games);
+    let msg = await birthday.removeBirthday(interaction.user.id);
     let embed = new EmbedBuilder()
-      .setTitle("Game Selector")
+      .setTitle("Birthday Bot")
       .setDescription(msg)
       .setColor(embedColors.mainColor);
     await interaction.reply({

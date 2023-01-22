@@ -1,25 +1,18 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const embedColors = require("../commandFunctions/embedColors");
-const gameSelect = require("../commandFunctions/pickGameFunctions");
+const gamble = require("../commandFunctions/gamble");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("pickgame")
-    .setDescription("Pick a random game to play"),
+    .setName("coinstats")
+    .setDescription("Check coin flip stats"),
   async execute(interaction) {
-    let games = [
-      "Apex",
-      "Valorant",
-      "Overwatch",
-      "Plateup",
-      "Roblox",
-      "League",
-    ];
-    let msg = gameSelect.pickGame(games);
+    let msg = await gamble.coinStats();
     let embed = new EmbedBuilder()
-      .setTitle("Game Selector")
+      .setTitle("Peep Casino")
       .setDescription(msg)
       .setColor(embedColors.mainColor);
+
     await interaction.reply({
       embeds: [embed],
     });

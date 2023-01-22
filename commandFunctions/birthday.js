@@ -65,8 +65,21 @@ async function checkBirthday() {
     return null
 }
 
+async function checkBirthdayDaily(client) {
+  var date = new Date();
+  if (date.getHours() === 7 && date.getMinutes() === 0) {
+    const channel = await client.channels.fetch(process.env.generalID);
+    var user = await checkBirthday();
+
+    if (user != null) {
+      channel.send({ content: `Happy Birthday, <@${user}>!` });
+    }
+  }
+}
+
 module.exports.addBirthday = addBirthday;
 module.exports.doesExist = doesExist;
 module.exports.removeBirthday = removeBirthday
 module.exports.findBirthday = findBirthday
 module.exports.checkBirthday = checkBirthday
+module.exports.checkBirthdayDaily = checkBirthdayDaily
