@@ -19,6 +19,6 @@
     "dotenv": "^16.0.3",
     "ffmpeg-static": "^5.1.0",
     "mongoose": "^6.6.5",
-    "ytdl-core": "^4.11.2"
+    "ytdl-core": "^4.11.3"
   }
 }
